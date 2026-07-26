@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Electronics Scanner — identify components, get pinouts & code</title>
+<meta name="description" content="Point your phone at a resistor, IC, sensor, or module and instantly get its pinout, wiring diagram, and ready-to-flash Arduino/ESP32 code. Free download for Android.">
+<style>
+  :root {
+    --bg: #0d1315;
+    --panel: #141c1f;
+    --panel-2: #182226;
+    --teal: #17c3ad;
+    --teal-dim: #0f8f7e;
+    --amber: #ffb300;
+    --text: #e8eeee;
+    --muted: #93a5a5;
+    --border: #24393c;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13,19,21,.88); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav { display: flex; align-items: center; gap: 22px; padding: 14px 0; }
+  .logo { font-weight: 800; font-size: 1.05rem; color: var(--teal); display: flex; align-items: center; gap: 8px; }
+  .logo span { color: var(--text); }
+  nav a { color: var(--muted); text-decoration: none; font-size: .92rem; }
+  nav a:hover { color: var(--text); }
+  nav .cta { margin-left: auto; }
+
+  .btn {
+    display: inline-block; padding: 13px 26px; border-radius: 12px;
+    font-weight: 700; text-decoration: none; font-size: 1rem;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--teal); color: #06211d; box-shadow: 0 6px 24px rgba(23,195,173,.25); }
+  .btn-primary:hover { box-shadow: 0 8px 30px rgba(23,195,173,.4); }
+  .btn-ghost { border: 1.5px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--teal-dim); }
+  .btn-small { padding: 9px 18px; font-size: .88rem; }
+
+  .hero { padding: 84px 0 60px; text-align: center; }
+  .hero h1 {
+    font-size: clamp(2rem, 5.5vw, 3.3rem); font-weight: 850; line-height: 1.15;
+    max-width: 800px; margin: 0 auto 18px;
+  }
+  .hero h1 em { color: var(--teal); font-style: normal; }
+  .hero p.sub { color: var(--muted); font-size: 1.12rem; max-width: 640px; margin: 0 auto 34px; }
+  .hero .btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .hero .note { margin-top: 14px; color: var(--muted); font-size: .84rem; }
+
+  .chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 42px; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+    padding: 7px 16px; font-size: .84rem; color: var(--muted);
+  }
+  .chip b { color: var(--teal); font-weight: 700; }
+
+  section { padding: 64px 0; }
+  section h2 { font-size: 1.9rem; font-weight: 800; text-align: center; margin-bottom: 10px; }
+  section p.lead { color: var(--muted); text-align: center; max-width: 620px; margin: 0 auto 42px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px;
+  }
+  .card .ico { font-size: 1.7rem; margin-bottom: 12px; }
+  .card h3 { font-size: 1.06rem; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: .92rem; }
+
+  .steps { counter-reset: step; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+  .step { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; position: relative; }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    display: inline-flex; width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(23,195,173,.15); color: var(--teal); font-weight: 800;
+    align-items: center; justify-content: center; margin-bottom: 14px;
+  }
+
+  .pricing { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 20px; max-width: 720px; margin: 0 auto; }
+  .plan { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px; display: flex; flex-direction: column; }
+  .plan.pro { border-color: var(--teal-dim); background: linear-gradient(160deg, var(--panel-2), var(--panel)); position: relative; }
+  .plan.pro .badge {
+    position: absolute; top: -12px; right: 22px; background: var(--amber);
+    color: #241a00; font-size: .74rem; font-weight: 800; padding: 4px 12px; border-radius: 999px;
+  }
+  .plan h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .plan .price { font-size: 2.1rem; font-weight: 850; margin-bottom: 4px; }
+  .plan .price small { font-size: .95rem; color: var(--muted); font-weight: 500; }
+  .plan ul { list-style: none; margin: 20px 0 26px; flex: 1; }
+  .plan li { padding: 7px 0; font-size: .93rem; color: var(--muted); }
+  .plan li::before { content: "✓  "; color: var(--teal); font-weight: 800; }
+  .plan li.no { opacity: .45; }
+  .plan li.no::before { content: "—  "; color: var(--muted); }
+
+  .install { max-width: 680px; margin: 0 auto; }
+  .install ol { margin-left: 22px; color: var(--muted); }
+  .install li { padding: 6px 0; }
+  .install b { color: var(--text); }
+
+  .faq { max-width: 720px; margin: 0 auto; }
+  details {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 10px;
+  }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); margin-top: 10px; font-size: .93rem; }
+
+  .safety {
+    max-width: 720px; margin: 40px auto 0; padding: 18px 22px;
+    border: 1px solid rgba(255,179,0,.35); background: rgba(255,179,0,.06);
+    border-radius: 12px; color: var(--muted); font-size: .88rem;
+  }
+  .safety b { color: var(--amber); }
+
+  footer { border-top: 1px solid var(--border); padding: 34px 0; color: var(--muted); font-size: .85rem; text-align: center; }
+  footer a { color: var(--teal); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo">⚡ <span>AI Electronics Scanner</span></div>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="cta btn btn-primary btn-small" href="https://github.com/engrjhon3-prog/AI-Electronics-Scan/releases/download/apk-latest/ai-electronics-scanner.apk">Download APK</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <h1>Point your camera at a component.<br>Get the <em>pinout, wiring & code</em>.</h1>
+  <p class="sub">Skip the datasheet hunt. Scan resistors, ICs, sensors, and modules with your phone — and go from photo to a working Arduino/ESP32 circuit in seconds.</p>
+  <div class="btns">
+    <a class="btn btn-primary" href="https://github.com/engrjhon3-prog/AI-Electronics-Scan/releases/download/apk-latest/ai-electronics-scanner.apk">⬇ Download for Android (free)</a>
+    <a class="btn btn-ghost" href="#pricing">See Pro plans</a>
+  </div>
+  <p class="note">Free APK · works fully offline · no account required to scan</p>
+  <div class="chips">
+    <div class="chip"><b>OCR</b> reads chip part numbers</div>
+    <div class="chip"><b>Colour-band AI</b> decodes resistors</div>
+    <div class="chip"><b>14+</b> components &amp; growing</div>
+    <div class="chip"><b>Arduino + ESP32</b> supported</div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Everything a maker needs</h2>
+    <p class="lead">Built for hobbyists, students, and tinkerers who want to build faster.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">📷</div><h3>Instant identification</h3><p>On-device AI reads printed part numbers (NE555, MPU-6050, HC-SR04…) and decodes resistor colour bands — even without internet.</p></div>
+      <div class="card"><div class="ico">📌</div><h3>Pinout reference</h3><p>Every pin labelled and colour-coded: power, ground, I2C, PWM, analog — with plain-English descriptions.</p></div>
+      <div class="card"><div class="ico">🔌</div><h3>Wiring diagrams <small>· Pro</small></h3><p>Clear board-specific diagrams showing exactly what connects where on your Arduino Uno or ESP32, with safety notes.</p></div>
+      <div class="card"><div class="ico">💻</div><h3>Ready-to-flash code <small>· Pro</small></h3><p>Working sketches with required libraries listed. Copy, paste into Arduino IDE, upload. Done.</p></div>
+      <div class="card"><div class="ico">📚</div><h3>Component catalog</h3><p>Browse and search the built-in knowledge base any time — LEDs, sensors, drivers, displays, and more.</p></div>
+      <div class="card"><div class="ico">🕘</div><h3>Scan history <small>· Pro</small></h3><p>Every component you've scanned, saved with photos — your personal parts inventory.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Three steps from mystery part to working circuit.</p>
+    <div class="steps">
+      <div class="step"><h3>Snap a photo</h3><p style="color:var(--muted);font-size:.92rem">Fill the frame with the component. The AI runs right on your phone.</p></div>
+      <div class="step"><h3>Confirm the match</h3><p style="color:var(--muted);font-size:.92rem">See ranked matches with confidence scores and what the scanner detected.</p></div>
+      <div class="step"><h3>Build</h3><p style="color:var(--muted);font-size:.92rem">Open the pinout, follow the wiring diagram, copy the code, and flash your board.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <h2>Simple pricing</h2>
+    <p class="lead">Start free. Upgrade when you're ready to build faster.</p>
+    <div class="pricing">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">$0</div>
+        <ul>
+          <li>20 scans per month</li>
+          <li>Component identification</li>
+          <li>Full pinout reference</li>
+          <li>Component catalog</li>
+          <li class="no">Wiring diagrams</li>
+          <li class="no">Code generation</li>
+          <li class="no">Full scan history</li>
+        </ul>
+        <a class="btn btn-ghost" href="https://github.com/engrjhon3-prog/AI-Electronics-Scan/releases/download/apk-latest/ai-electronics-scanner.apk">Download free</a>
+      </div>
+      <div class="plan pro">
+        <div class="badge">BEST VALUE</div>
+        <h3>Pro</h3>
+        <div class="price">$3.99<small>/month</small></div>
+        <ul>
+          <li>Unlimited scans</li>
+          <li>Component identification</li>
+          <li>Full pinout reference</li>
+          <li>Component catalog</li>
+          <li>Wiring diagrams for Uno &amp; ESP32</li>
+          <li>Ready-to-flash code generation</li>
+          <li>Full scan history</li>
+        </ul>
+        <a class="btn btn-primary" href="mailto:jhonisaacalegre@gmail.com?subject=AI%20Electronics%20Scanner%20Pro%20subscription">Subscribe — contact us</a>
+        <p style="margin-top:12px;color:var(--muted);font-size:.78rem;text-align:center">Online checkout is coming soon. For now, email us and we'll set up your Pro access.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap install">
+    <h2>Installing the APK</h2>
+    <p class="lead">The app is distributed directly — not yet on the Play Store.</p>
+    <ol>
+      <li>On your Android phone, tap <b>Download APK</b> above.</li>
+      <li>Open the downloaded <b>ai-electronics-scanner.apk</b>.</li>
+      <li>If prompted, allow your browser to <b>install unknown apps</b> (Settings → Install unknown apps). This is normal for apps outside the Play Store.</li>
+      <li>Tap <b>Install</b>, then open the app and scan your first component.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>FAQ</h2>
+    <p class="lead"></p>
+    <div class="faq">
+      <details>
+        <summary>Does it need internet?</summary>
+        <p>No — identification, pinouts, wiring, and code all run on your phone. Internet is only needed to download the app and future updates.</p>
+      </details>
+      <details>
+        <summary>Which boards are supported?</summary>
+        <p>Arduino Uno and ESP32 today (Nano and ESP8266 wiring is largely identical). More boards are on the roadmap.</p>
+      </details>
+      <details>
+        <summary>Which components can it recognise?</summary>
+        <p>Resistors (with value decoding), plus labelled parts: NE555, L293D, DHT11, HC-SR04, HC-SR501 PIR, MPU-6050, SSD1306 OLED, HC-05 Bluetooth, SG90 servo, relay modules, buttons, potentiometers, LEDs — and the catalog grows with each update.</p>
+      </details>
+      <details>
+        <summary>Why isn't it on the Play Store?</summary>
+        <p>We're in early access. Direct APK distribution lets us ship improvements faster. A Play Store release is planned.</p>
+      </details>
+      <details>
+        <summary>How do I cancel Pro?</summary>
+        <p>Email us any time and we'll cancel immediately — no lock-in.</p>
+      </details>
+    </div>
+    <div class="safety">
+      <b>Safety note:</b> wiring suggestions are a starting point. Always double-check voltage levels and polarity before powering a circuit, and never work with mains voltage unless qualified.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>⚡ AI Electronics Scanner · <a href="https://github.com/engrjhon3-prog/AI-Electronics-Scan">Open source on GitHub</a> · <a href="mailto:jhonisaacalegre@gmail.com">Contact</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
