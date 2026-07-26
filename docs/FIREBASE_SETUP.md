@@ -1,54 +1,63 @@
-# Firebase — what it's for and exactly what to provide
+# Firebase — current setup
 
-**Short version: the app works today without Firebase.** Scan history is stored
-on-device and the backend is stateless. Firebase becomes worthwhile when you
-want (a) user accounts, (b) history synced across devices / surviving
-reinstalls, and (c) server-verified subscriptions. When you're ready, here is
-*exactly* what to do and what to hand over.
+Project: **electronics-cf10c** (configured and live).
 
-## What you need to do (all doable from a phone browser)
+## What's wired up
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com)
-   → **Add project** → name it e.g. `ai-electronics-scan` (Analytics optional).
+| Piece | Status |
+|---|---|
+| Email/Password sign-in | ✅ Enabled |
+| Firestore database | ✅ `(default)` created |
+| Security rules | ✅ Deployed from `firebase/firestore.rules` |
+| Admin account | ✅ `jhonisaacalegre@gmail.com` with `admin` + `premium` custom claims |
+| Android app config | ✅ `frontend/android/app/google-services.json` (package `com.aielectronics.electronics_scanner`) |
+| Website auth | ✅ `website/account.html` (web app config) |
 
-2. In the project, click **Add app → Android** and enter:
-   - **Package name**: `com.aielectronics.electronics_scanner`
-     (must match exactly — it's set in
-     `frontend/android/app/build.gradle.kts`)
-   - Nickname: anything. SHA-1 can be skipped for now (needed later only for
-     Google Sign-In).
+## Data model
 
-3. Download the **`google-services.json`** file it gives you.
+```
+entitlements/{email}         premium: bool, grantedBy, grantedAt
+    Admin-written. The app/website read this (plus the `premium` custom
+    claim) to unlock Pro.
 
-4. In the console, enable these products (left sidebar → Build):
-   - **Authentication** → Sign-in method → enable **Anonymous** (and
-     optionally **Google**).
-   - **Cloud Firestore** → Create database → production mode → nearest region.
+users/{uid}/uploads/{id}     name, componentId, imageB64, createdAt, expiresAt
+    Scan photos as compressed JPEG (base64) — Firestore instead of Cloud
+    Storage so everything stays on the free Spark plan.
+    Retention: free = 12 hours (max 3 active), Pro = 7 days.
+```
 
-5. Create a backend service account key:
-   - Project settings (gear icon) → **Service accounts** →
-     **Generate new private key** → downloads a JSON file.
+Retention is enforced in three layers:
+1. **Rules** — creates must set `expiresAt` within the tier's window
+   (rules check the entitlement), and expired docs can't be read at all.
+2. **App** — purges the signed-in user's expired uploads on launch.
+3. **Scheduled job** — `.github/workflows/cleanup.yml` runs every 6 hours
+   and deletes expired docs across all users.
 
-## What to give me
+## One manual step: the cleanup job's credential
 
-| Item | How to share | Sensitivity |
-|---|---|---|
-| `google-services.json` | Commit to the repo is acceptable (it contains identifiers, not secrets) — or paste its contents in chat | Low |
-| Service-account JSON | **Never commit.** Add as a GitHub Actions secret named `FIREBASE_SERVICE_ACCOUNT`, and set it as the `FIREBASE_SERVICE_ACCOUNT_JSON` env var on the Vast.ai instance | **High — treat like a password** |
-| Project ID (e.g. `ai-electronics-scan-1a2b3`) | Paste in chat | Low |
+The scheduled cleanup needs the Firebase service-account key as a GitHub
+secret (it must NEVER be committed to the repo):
 
-## What I'll wire up once you provide those
+1. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
+2. Name: `FIREBASE_SERVICE_ACCOUNT`
+3. Value: paste the entire service-account JSON (the file named
+   `electronics-cf10c-firebase-adminsdk-....json`)
 
-- **App**: `firebase_core`, `firebase_auth` (anonymous sign-in on first launch),
-  `cloud_firestore` — `HistoryService` gets a Firestore-backed implementation
-  (it was designed as an interface for exactly this swap).
-- **Backend**: `firebase-admin` — `_require_premium` in `backend/app/main.py`
-  switches from the dev token to verifying a Firebase ID token + custom
-  `premium` claim, which gets set on successful purchase.
-- **Firestore rules**: users can only read/write their own
-  `users/{uid}/scans/...` documents.
+Until the secret is added the job runs and exits harmlessly; rules + in-app
+purge still keep expired images inaccessible.
 
-## Billing note
+## Granting Pro to a customer
 
-Firebase's free Spark plan covers this app comfortably at hobby scale
-(50k Firestore reads/day, unlimited auth users). No card required.
+Sign in as the admin account in the app (Settings → Account) or on the
+website (`/account.html`) and use the **Admin — manage subscriptions** panel:
+enter the customer's email → Grant Pro. Their app unlocks on next refresh.
+
+## Security notes
+
+- `google-services.json` and the web config contain public identifiers, not
+  secrets — safe in the repo.
+- The service-account JSON is a master key — GitHub secret / local only.
+  If it ever leaks, revoke it in Firebase console → Project settings →
+  Service accounts.
+- The admin password was set from a chat message; consider changing it in
+  the app/website via "Forgot password?" or the Firebase console.

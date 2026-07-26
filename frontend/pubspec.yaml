@@ -44,6 +44,11 @@ dependencies:
   # Pure-Dart image decoding for the on-device resistor colour-band decoder.
   image: ^4.3.0
 
+  # Accounts + Pro entitlements (synced from Firestore, granted by admins).
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  cloud_firestore: ^5.5.0
+
   # Networking to the optional Python backend (not required for core features).
   http: ^1.2.2
 

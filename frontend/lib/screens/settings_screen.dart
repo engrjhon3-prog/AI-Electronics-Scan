@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../config.dart';
 import '../state/app_state.dart';
+import 'account_screen.dart';
 import 'paywall_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -23,9 +24,29 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 ListTile(
                   leading: Icon(
+                    app.signedIn
+                        ? Icons.account_circle
+                        : Icons.account_circle_outlined,
+                    color: scheme.primary,
+                  ),
+                  title: Text(
+                      app.signedIn
+                          ? (app.user?.email ?? 'Account')
+                          : 'Sign in / Create account',
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: Text(app.signedIn
+                      ? 'Manage your account & cloud uploads'
+                      : 'Save scans to the cloud and unlock Pro'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const AccountScreen())),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
                     app.isPremium
                         ? Icons.workspace_premium
-                        : Icons.person_outline,
+                        : Icons.bolt_outlined,
                     color:
                         app.isPremium ? scheme.secondary : scheme.primary,
                   ),

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,8 +7,15 @@ import 'state/app_state.dart';
 import 'theme.dart';
 import 'screens/home_shell.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    // Reads config from android/app/google-services.json. If it's absent
+    // (tests, stripped builds) the app still runs — scanning is offline.
+    await Firebase.initializeApp();
+  } catch (_) {
+    // Accounts unavailable; core features work without them.
+  }
   runApp(const ElectronicsScannerApp());
 }
 

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account — AI Electronics Scanner</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root {
+    --bg: #0d1315; --panel: #141c1f; --teal: #17c3ad; --teal-dim: #0f8f7e;
+    --amber: #ffb300; --text: #e8eeee; --muted: #93a5a5; --border: #24393c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Roboto, sans-serif; line-height: 1.6; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 20px; }
+  header { border-bottom: 1px solid var(--border); }
+  nav { display: flex; align-items: center; gap: 10px; padding: 14px 20px; max-width: 1060px; margin: 0 auto; }
+  nav img { border-radius: 7px; }
+  nav a { color: var(--text); text-decoration: none; font-weight: 800; }
+  nav .back { margin-left: auto; color: var(--muted); font-weight: 500; font-size: .9rem; }
+  h1 { font-size: 1.5rem; margin: 26px 0 6px; }
+  p.sub { color: var(--muted); font-size: .92rem; margin-bottom: 22px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+  label { display: block; font-size: .82rem; color: var(--muted); margin: 12px 0 4px; }
+  input {
+    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: #0f181a; color: var(--text); font-size: 1rem;
+  }
+  input:focus { outline: 2px solid var(--teal-dim); border-color: transparent; }
+  .btn {
+    display: inline-block; width: 100%; padding: 13px; margin-top: 16px; border-radius: 10px;
+    border: none; font-weight: 700; font-size: 1rem; cursor: pointer;
+  }
+  .btn-primary { background: var(--teal); color: #06211d; }
+  .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+  .btn:disabled { opacity: .5; cursor: wait; }
+  .linkrow { display: flex; justify-content: space-between; margin-top: 12px; font-size: .85rem; }
+  .linkrow a { color: var(--teal); cursor: pointer; text-decoration: none; }
+  .msg { margin-top: 12px; font-size: .88rem; min-height: 1.2em; }
+  .msg.err { color: #ff8a80; }
+  .msg.ok { color: #7fe0b2; }
+  .plan { display: flex; align-items: center; gap: 12px; }
+  .badge { padding: 4px 12px; border-radius: 999px; font-size: .8rem; font-weight: 800; }
+  .badge.pro { background: rgba(255,179,0,.18); color: var(--amber); }
+  .badge.free { background: rgba(23,195,173,.14); color: var(--teal); }
+  .muted { color: var(--muted); font-size: .85rem; }
+  .hidden { display: none; }
+  h2 { font-size: 1.05rem; margin-bottom: 8px; }
+  .adminrow { display: flex; gap: 10px; margin-top: 12px; }
+  .adminrow .btn { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <img src="logo.svg" width="30" height="30" alt="">
+    <a href="index.html">AI Electronics Scanner</a>
+    <a class="back" href="index.html">← Back to site</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <h1>Your account</h1>
+  <p class="sub">Sign in with the same account you use in the app to see your subscription status.</p>
+
+  <!-- Signed out -->
+  <div id="authCard" class="card">
+    <h2 id="authTitle">Sign in</h2>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <button id="submitBtn" class="btn btn-primary">Sign in</button>
+    <div class="linkrow">
+      <a id="toggleMode">New here? Create an account</a>
+      <a id="resetPw">Forgot password?</a>
+    </div>
+    <div id="authMsg" class="msg"></div>
+  </div>
+
+  <!-- Signed in -->
+  <div id="profileCard" class="card hidden">
+    <div class="plan">
+      <div>
+        <div id="userEmail" style="font-weight:700"></div>
+        <div class="muted">AI Electronics Scanner account</div>
+      </div>
+      <span id="planBadge" class="badge free" style="margin-left:auto">FREE</span>
+    </div>
+    <div id="proMsg" class="muted" style="margin-top:14px"></div>
+    <button id="refreshBtn" class="btn btn-ghost">Refresh status</button>
+    <button id="signOutBtn" class="btn btn-ghost">Sign out</button>
+  </div>
+
+  <!-- Subscribe info -->
+  <div id="subscribeCard" class="card hidden">
+    <h2>Subscribe to Pro — $3.99/mo</h2>
+    <p class="muted">
+      Email <a href="mailto:jhonisaacalegre@gmail.com" style="color:var(--teal)">jhonisaacalegre@gmail.com</a>
+      from your account email and we'll send payment options. Once payment is
+      confirmed, Pro activates on your account — tap “Refresh status” here or in the app.
+    </p>
+  </div>
+
+  <!-- Admin -->
+  <div id="adminCard" class="card hidden">
+    <h2>Admin — manage subscriptions</h2>
+    <p class="muted">Grant or revoke Pro for a customer after payment.</p>
+    <label for="custEmail">Customer email</label>
+    <input id="custEmail" type="email">
+    <div class="adminrow">
+      <button id="grantBtn" class="btn btn-primary">Grant Pro</button>
+      <button id="revokeBtn" class="btn btn-ghost">Revoke</button>
+    </div>
+    <div id="adminMsg" class="msg"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, sendPasswordResetEmail, signOut
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyCIE9gF9HPpl9tKa1dbjapmbglRE4IiUJE",
+    authDomain: "electronics-cf10c.firebaseapp.com",
+    projectId: "electronics-cf10c",
+    storageBucket: "electronics-cf10c.firebasestorage.app",
+    messagingSenderId: "730444382679",
+    appId: "1:730444382679:web:c3d013e33fec23778f0b92",
+  });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (id) => document.getElementById(id);
+  let creating = false;
+
+  const show = (el, on) => el.classList.toggle("hidden", !on);
+  const msg = (el, text, ok) => { el.textContent = text; el.className = "msg " + (ok ? "ok" : "err"); };
+
+  $("toggleMode").onclick = () => {
+    creating = !creating;
+    $("authTitle").textContent = creating ? "Create account" : "Sign in";
+    $("submitBtn").textContent = creating ? "Create account" : "Sign in";
+    $("toggleMode").textContent = creating
+      ? "Already have an account? Sign in"
+      : "New here? Create an account";
+  };
+
+  $("submitBtn").onclick = async () => {
+    const email = $("email").value.trim(), pw = $("password").value;
+    $("submitBtn").disabled = true;
+    try {
+      if (creating) await createUserWithEmailAndPassword(auth, email, pw);
+      else await signInWithEmailAndPassword(auth, email, pw);
+      msg($("authMsg"), "", true);
+    } catch (e) {
+      msg($("authMsg"), friendly(e), false);
+    } finally { $("submitBtn").disabled = false; }
+  };
+
+  $("resetPw").onclick = async () => {
+    const email = $("email").value.trim();
+    if (!email) return msg($("authMsg"), "Enter your email first.", false);
+    try { await sendPasswordResetEmail(auth, email); msg($("authMsg"), "Reset email sent.", true); }
+    catch (e) { msg($("authMsg"), friendly(e), false); }
+  };
+
+  $("signOutBtn").onclick = () => signOut(auth);
+  $("refreshBtn").onclick = () => refreshStatus(true);
+
+  async function refreshStatus(force) {
+    const user = auth.currentUser;
+    if (!user) return;
+    let premium = false, admin = false;
+    try {
+      const token = await user.getIdTokenResult(force === true);
+      premium = token.claims.premium === true;
+      admin = token.claims.admin === true;
+    } catch (_) {}
+    if (!premium && user.email) {
+      try {
+        const snap = await getDoc(doc(db, "entitlements", user.email.toLowerCase()));
+        premium = snap.exists() && snap.data().premium === true;
+      } catch (_) {}
+    }
+    $("planBadge").textContent = admin ? "ADMIN" : premium ? "PRO" : "FREE";
+    $("planBadge").className = "badge " + (premium || admin ? "pro" : "free");
+    $("proMsg").textContent = premium
+      ? "Pro is active — wiring diagrams, code generation, and 7-day cloud storage are unlocked in the app."
+      : "No active subscription on this account yet.";
+    show($("subscribeCard"), !premium && !admin);
+    show($("adminCard"), admin);
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    show($("authCard"), !user);
+    show($("profileCard"), !!user);
+    if (user) { $("userEmail").textContent = user.email || ""; refreshStatus(); }
+    else { show($("subscribeCard"), false); show($("adminCard"), false); }
+  });
+
+  async function setPremium(value) {
+    const email = $("custEmail").value.trim().toLowerCase();
+    if (!email || !email.includes("@")) return msg($("adminMsg"), "Enter the customer's email.", false);
+    try {
+      await setDoc(doc(db, "entitlements", email), {
+        premium: value,
+        [value ? "grantedBy" : "revokedBy"]: auth.currentUser?.email || "admin",
+        [value ? "grantedAt" : "revokedAt"]: serverTimestamp(),
+      }, { merge: true });
+      msg($("adminMsg"), (value ? "Pro granted to " : "Pro revoked for ") + email, true);
+      $("custEmail").value = "";
+    } catch (e) {
+      msg($("adminMsg"), "Failed: " + friendly(e), false);
+    }
+  }
+  $("grantBtn").onclick = () => setPremium(true);
+  $("revokeBtn").onclick = () => setPremium(false);
+
+  function friendly(e) {
+    const code = e && e.code || "";
+    if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found"))
+      return "Wrong email or password.";
+    if (code.includes("email-already-in-use")) return "Account exists — try signing in.";
+    if (code.includes("weak-password")) return "Password too weak (6+ characters).";
+    if (code.includes("invalid-email")) return "That email looks invalid.";
+    if (code.includes("permission-denied")) return "Not allowed (admin only).";
+    return (e && e.message) || String(e);
+  }
+</script>
+
+</body>
+</html>

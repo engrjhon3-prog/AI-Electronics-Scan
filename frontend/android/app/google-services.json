@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "730444382679",
+    "project_id": "electronics-cf10c",
+    "storage_bucket": "electronics-cf10c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730444382679:android:6d872541b50f4a398f0b92",
+        "android_client_info": {
+          "package_name": "com.aielectronics.electronics_scanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730444382679-08iq8eekfsu9qs6s5ia2va6i62fn601j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsI3uN94CwbDBfHvDWPKcvOELPOv_zEI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730444382679-08iq8eekfsu9qs6s5ia2va6i62fn601j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

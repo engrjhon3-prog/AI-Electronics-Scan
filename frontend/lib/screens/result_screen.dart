@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/scan_result.dart';
+import '../state/app_state.dart';
 import '../widgets/confidence_bar.dart';
 import '../widgets/type_badge.dart';
 import 'component_detail_screen.dart';
@@ -37,6 +39,20 @@ class ResultScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+          Builder(builder: (context) {
+            final note = context.watch<AppState>().lastCloudNote;
+            if (note == null) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Card(
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(Icons.cloud_outlined, color: scheme.primary),
+                  title: Text(note, style: const TextStyle(fontSize: 13)),
+                ),
+              ),
+            );
+          }),
           if (result.hasMatch)
             _BestMatchCard(match: result.bestMatch!)
           else

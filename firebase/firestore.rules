@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isPremiumUser() {
+      return signedIn() && (
+        request.auth.token.premium == true
+        || (request.auth.token.email != null
+            && exists(/databases/$(database)/documents/entitlements/$(request.auth.token.email.lower()))
+            && get(/databases/$(database)/documents/entitlements/$(request.auth.token.email.lower())).data.premium == true)
+      );
+    }
+
+    // Per-user profile + synced data. Owners only (admins can read for support).
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if signedIn() && request.auth.uid == uid;
+
+      // Uploaded scan photos with retention:
+      //   free -> expires <= 12h from now, Pro -> expires <= 7 days from now.
+      // Expired documents become unreadable immediately; a scheduled job
+      // physically deletes them.
+      match /uploads/{uploadId} {
+        allow read: if signedIn()
+          && (request.auth.uid == uid || isAdmin())
+          && resource.data.expiresAt > request.time;
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.expiresAt is timestamp
+          && request.resource.data.expiresAt <= request.time
+              + (isPremiumUser() ? duration.value(7, 'd') : duration.value(12, 'h'))
+          && request.resource.data.imageB64 is string
+          && request.resource.data.imageB64.size() < 950000;
+        allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+        allow update: if false;
+      }
+    }
+
+    // Pro entitlements, keyed by lowercased email. Only admins may grant or
+    // revoke; a signed-in user may read their own entitlement.
+    match /entitlements/{email} {
+      allow read: if isAdmin()
+        || (signedIn() && request.auth.token.email != null
+            && request.auth.token.email.lower() == email);
+      allow write: if isAdmin();
+    }
+  }
+}
