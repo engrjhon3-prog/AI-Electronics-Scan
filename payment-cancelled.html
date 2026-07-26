@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment cancelled — AI Electronics Scanner</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root {
+    --bg: #0d1315; --panel: #141c1f; --teal: #17c3ad; --amber: #ffb300;
+    --text: #e8eeee; --muted: #93a5a5; --border: #24393c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    font-family: "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+    padding: 34px 26px; max-width: 460px; text-align: center;
+  }
+  .mark {
+    width: 74px; height: 74px; margin: 0 auto 18px; border-radius: 50%;
+    background: rgba(255,179,0,.15); color: var(--amber);
+    display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 10px; }
+  p { color: var(--muted); font-size: .95rem; }
+  p + p { margin-top: 12px; }
+  .btn {
+    display: inline-block; margin-top: 22px; padding: 13px 22px; border-radius: 10px;
+    background: var(--teal); color: #06211d; font-weight: 700; text-decoration: none;
+  }
+  .btn.ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); margin-left: 8px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">!</div>
+    <h1>Payment cancelled</h1>
+    <p>Nothing was charged to your GCash wallet.</p>
+    <p>
+      You can head back to the app and try again any time — the free tier keeps
+      working in the meantime (20 scans a month, full pinout reference).
+    </p>
+    <a class="btn" href="account.html">Back to my account</a>
+    <a class="btn ghost" href="index.html">Home</a>
+  </div>
+</body>
+</html>
