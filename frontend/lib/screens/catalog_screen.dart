@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/component.dart';
-import '../services/api_client.dart';
 import '../state/app_state.dart';
 import '../widgets/type_badge.dart';
 import 'component_detail_screen.dart';
 
-/// Browsable catalogue of every component in the knowledge base.
+/// Browsable catalogue of every component in the bundled knowledge base.
+/// Fully offline — the database ships inside the APK.
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
 
@@ -16,33 +16,11 @@ class CatalogScreen extends StatefulWidget {
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
-  List<Component>? _components;
-  String? _error;
   String _query = '';
   String? _typeFilter;
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() => _error = null);
-    final api = context.read<AppState>().api;
-    try {
-      final items = await api.listComponents();
-      items.sort((a, b) => a.name.compareTo(b.name));
-      if (mounted) setState(() => _components = items);
-    } on ApiException catch (e) {
-      if (mounted) setState(() => _error = e.message);
-    } catch (e) {
-      if (mounted) setState(() => _error = '$e');
-    }
-  }
-
-  List<Component> get _filtered {
-    var items = _components ?? [];
+  List<Component> _filtered(List<Component> all) {
+    var items = all;
     if (_typeFilter != null) {
       items = items.where((c) => c.type == _typeFilter).toList();
     }
@@ -60,100 +38,84 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final types = (_components ?? [])
-        .map((c) => c.type)
-        .toSet()
-        .toList()
-      ..sort();
+    final app = context.watch<AppState>();
+    final all = app.components;
+    final types = all.map((c) => c.type).toSet().toList()..sort();
+    final filtered = _filtered(all);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Component catalog')),
-      body: _error != null
-          ? Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_error!),
-                  const SizedBox(height: 12),
-                  OutlinedButton(
-                      onPressed: _load, child: const Text('Retry')),
-                ],
-              ),
-            )
-          : _components == null
-              ? const Center(child: CircularProgressIndicator())
-              : RefreshIndicator(
-                  onRefresh: _load,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
+      body: !app.initialised
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search components…',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    isDense: true,
+                  ),
+                  onChanged: (v) => setState(() => _query = v),
+                ),
+                const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search components…',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                          isDense: true,
-                        ),
-                        onChanged: (v) => setState(() => _query = v),
-                      ),
-                      const SizedBox(height: 12),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FilterChip(
-                                label: const Text('All'),
-                                selected: _typeFilter == null,
-                                onSelected: (_) =>
-                                    setState(() => _typeFilter = null),
-                              ),
-                            ),
-                            for (final t in types)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: FilterChip(
-                                  label: Text(t),
-                                  selected: _typeFilter == t,
-                                  onSelected: (_) => setState(() =>
-                                      _typeFilter = _typeFilter == t ? null : t),
-                                ),
-                              ),
-                          ],
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: const Text('All'),
+                          selected: _typeFilter == null,
+                          onSelected: (_) =>
+                              setState(() => _typeFilter = null),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      for (final c in _filtered)
-                        Card(
-                          child: ListTile(
-                            leading: TypeBadge(type: c.type),
-                            title: Text(c.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600)),
-                            subtitle: Text(
-                              c.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: const Icon(Icons.chevron_right),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ComponentDetailScreen(componentId: c.id),
-                              ),
-                            ),
+                      for (final t in types)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            label: Text(t),
+                            selected: _typeFilter == t,
+                            onSelected: (_) => setState(() =>
+                                _typeFilter = _typeFilter == t ? null : t),
                           ),
-                        ),
-                      if (_filtered.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Center(child: Text('No components match.')),
                         ),
                     ],
                   ),
                 ),
+                const SizedBox(height: 12),
+                for (final c in filtered)
+                  Card(
+                    child: ListTile(
+                      leading: TypeBadge(type: c.type),
+                      title: Text(c.name,
+                          style:
+                              const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        c.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ComponentDetailScreen(componentId: c.id),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (filtered.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: Text('No components match.')),
+                  ),
+              ],
+            ),
     );
   }
 }

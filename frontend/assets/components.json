@@ -1,0 +1,1479 @@
+{
+ "version": 1,
+ "components": [
+  {
+   "id": "led_5mm",
+   "type": "led",
+   "name": "5mm LED",
+   "aliases": [
+    "led",
+    "light emitting diode"
+   ],
+   "description": "A standard 5mm through-hole LED. Always drive it through a current-limiting resistor (220-330Ω for 5V logic).",
+   "package": "5mm THT",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "Anode (+)",
+     "type": "signal",
+     "description": "Longer leg, connects toward positive"
+    },
+    {
+     "number": 2,
+     "name": "Cathode (-)",
+     "type": "ground",
+     "description": "Shorter leg / flat side, to ground"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "output",
+    "beginner"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "Anode (+)",
+       "to_pin": "D13",
+       "note": "Through a 220Ω resistor"
+      },
+      {
+       "from_pin": "Cathode (-)",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "Never connect an LED directly without a series resistor."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 222\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"222\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">5mm LED</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D13</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Anode (+)</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Through a 220Ω resistor</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Cathode (-)</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "Anode (+)",
+       "to_pin": "GPIO2",
+       "note": "Through a 220Ω resistor"
+      },
+      {
+       "from_pin": "Cathode (-)",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "ESP32 GPIOs are 3.3V; a 220Ω resistor is fine."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 222\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"222\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">5mm LED</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO2</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Anode (+)</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Through a 220Ω resistor</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Cathode (-)</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Blink an LED",
+     "description": "",
+     "libraries": [],
+     "code": "const int LED_PIN = 13;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, HIGH);\n  delay(500);\n  digitalWrite(LED_PIN, LOW);\n  delay(500);\n}\n"
+    },
+    "esp32": {
+     "title": "Blink an LED (ESP32)",
+     "description": "",
+     "libraries": [],
+     "code": "const int LED_PIN = 2;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, HIGH);\n  delay(500);\n  digitalWrite(LED_PIN, LOW);\n  delay(500);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "resistor",
+   "type": "resistor",
+   "name": "Resistor",
+   "aliases": [
+    "resistor",
+    "ohm"
+   ],
+   "description": "A passive two-terminal component that limits current. The colour bands encode its resistance value and tolerance.",
+   "package": "Axial THT",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "Terminal A",
+     "type": "signal",
+     "description": "Non-polarised"
+    },
+    {
+     "number": 2,
+     "name": "Terminal B",
+     "type": "signal",
+     "description": "Non-polarised"
+    }
+   ],
+   "supported_boards": [
+    "uno"
+   ],
+   "tags": [
+    "passive"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "Terminal A",
+       "to_pin": "Signal",
+       "note": "In series with the load"
+      },
+      {
+       "from_pin": "Terminal B",
+       "to_pin": "Load",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "Resistors are not polarised — orientation does not matter."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 222\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"222\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Resistor</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">Signal</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Terminal A</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">In series with the load</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">Load</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Terminal B</text></svg>"
+    }
+   },
+   "code": {}
+  },
+  {
+   "id": "push_button",
+   "type": "module",
+   "name": "Tactile Push Button",
+   "aliases": [
+    "button",
+    "push button",
+    "momentary switch",
+    "tact switch"
+   ],
+   "description": "A momentary tactile switch. Use the internal pull-up so the pin reads HIGH when released and LOW when pressed.",
+   "package": "6mm THT",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "Pin 1",
+     "type": "signal",
+     "description": "One side of the switch"
+    },
+    {
+     "number": 2,
+     "name": "Pin 2",
+     "type": "ground",
+     "description": "Other side, to GND"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "input",
+    "beginner"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "Pin 1",
+       "to_pin": "D2",
+       "note": "Use INPUT_PULLUP"
+      },
+      {
+       "from_pin": "Pin 2",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "With INPUT_PULLUP the pin reads LOW when pressed."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 222\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"222\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Tactile Push Button</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D2</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Pin 1</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Use INPUT_PULLUP</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Pin 2</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "Pin 1",
+       "to_pin": "GPIO4",
+       "note": "Use INPUT_PULLUP"
+      },
+      {
+       "from_pin": "Pin 2",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 222\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"222\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"112\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Tactile Push Button</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO4</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Pin 1</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Use INPUT_PULLUP</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Pin 2</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Read a push button",
+     "description": "",
+     "libraries": [],
+     "code": "const int BUTTON_PIN = 2;\n\nvoid setup() {\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool pressed = digitalRead(BUTTON_PIN) == LOW;\n  Serial.println(pressed ? \"Pressed\" : \"Released\");\n  delay(100);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "potentiometer",
+   "type": "sensor",
+   "name": "Potentiometer",
+   "aliases": [
+    "pot",
+    "potentiometer",
+    "trimpot",
+    "variable resistor"
+   ],
+   "description": "A three-terminal variable resistor. The wiper outputs an analog voltage between the two ends.",
+   "package": "THT",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "GND",
+     "type": "ground",
+     "description": "One end of the track"
+    },
+    {
+     "number": 2,
+     "name": "Wiper",
+     "type": "analog",
+     "description": "Middle terminal, analog out"
+    },
+    {
+     "number": 3,
+     "name": "VCC",
+     "type": "power",
+     "description": "Other end of the track"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "input",
+    "analog"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "Wiper",
+       "to_pin": "A0",
+       "note": "Analog input"
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Potentiometer</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">A0</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Wiper</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Analog input</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "Wiper",
+       "to_pin": "GPIO34",
+       "note": "ADC1 input-only pin"
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "3V3",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "Use an ADC1 pin (GPIO32-39). Keep input <= 3.3V."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Potentiometer</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO34</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Wiper</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">ADC1 input-only pin</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">3V3</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Read a potentiometer",
+     "description": "",
+     "libraries": [],
+     "code": "const int POT_PIN = A0;\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int value = analogRead(POT_PIN);       // 0..1023\n  Serial.println(value);\n  delay(100);\n}\n"
+    },
+    "esp32": {
+     "title": "Read a potentiometer (ESP32)",
+     "description": "",
+     "libraries": [],
+     "code": "const int POT_PIN = 34;\n\nvoid setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  int value = analogRead(POT_PIN);       // 0..4095 (12-bit)\n  Serial.println(value);\n  delay(100);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "ne555",
+   "type": "ic",
+   "name": "NE555 Timer",
+   "aliases": [
+    "555",
+    "ne555",
+    "555 timer",
+    "timer ic"
+   ],
+   "description": "The classic 8-pin timer IC, used for astable oscillators, monostable one-shots, and PWM.",
+   "package": "DIP-8",
+   "datasheet_url": "https://www.ti.com/lit/ds/symlink/ne555.pdf",
+   "pins": [
+    {
+     "number": 1,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    },
+    {
+     "number": 2,
+     "name": "TRIG",
+     "type": "signal",
+     "description": "Trigger (< 1/3 Vcc starts pulse)"
+    },
+    {
+     "number": 3,
+     "name": "OUT",
+     "type": "signal",
+     "description": "Output"
+    },
+    {
+     "number": 4,
+     "name": "RESET",
+     "type": "signal",
+     "description": "Active-low reset, tie to Vcc"
+    },
+    {
+     "number": 5,
+     "name": "CTRL",
+     "type": "analog",
+     "description": "Control voltage, 10nF to GND"
+    },
+    {
+     "number": 6,
+     "name": "THRES",
+     "type": "signal",
+     "description": "Threshold (> 2/3 Vcc ends pulse)"
+    },
+    {
+     "number": 7,
+     "name": "DISCH",
+     "type": "signal",
+     "description": "Discharge"
+    },
+    {
+     "number": 8,
+     "name": "VCC",
+     "type": "power",
+     "description": "4.5-15V supply"
+    }
+   ],
+   "supported_boards": [
+    "uno"
+   ],
+   "tags": [
+    "analog",
+    "timer"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "RESET",
+       "to_pin": "5V",
+       "note": "Tie high to enable"
+      },
+      {
+       "from_pin": "OUT",
+       "to_pin": "D2",
+       "note": "Read the oscillator output"
+      },
+      {
+       "from_pin": "CTRL",
+       "to_pin": "GND",
+       "note": "Via 10nF capacitor"
+      }
+     ],
+     "notes": [
+      "Astable: R1 from VCC->DISCH, R2 from DISCH->THRES(=TRIG), C from THRES->GND.",
+      "Frequency = 1.44 / ((R1 + 2*R2) * C)."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 360\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"360\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"250\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"250\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">NE555 Timer</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">RESET</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Tie high to enable</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D2</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">OUT</text><text x=\"260.0\" y=\"254\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Read the oscillator output</text><path d=\"M 220 286 C 260.0 286, 260.0 286, 300 286\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"286\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"286\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"280\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"280\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">CTRL</text><text x=\"260.0\" y=\"300\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Via 10nF capacitor</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Measure 555 output frequency",
+     "description": "",
+     "libraries": [],
+     "code": "const int SIGNAL_PIN = 2;\n\nvoid setup() {\n  pinMode(SIGNAL_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long highTime = pulseIn(SIGNAL_PIN, HIGH);\n  unsigned long lowTime  = pulseIn(SIGNAL_PIN, LOW);\n  unsigned long period = highTime + lowTime;\n  if (period > 0) {\n    float freq = 1000000.0 / period;   // Hz\n    Serial.print(\"Frequency: \");\n    Serial.print(freq);\n    Serial.println(\" Hz\");\n  }\n  delay(500);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "dht11",
+   "type": "sensor",
+   "name": "DHT11 Temperature & Humidity Sensor",
+   "aliases": [
+    "dht11",
+    "dht",
+    "temperature humidity sensor"
+   ],
+   "description": "A low-cost digital temperature and humidity sensor using a single-wire protocol. DHT22 is the higher-precision sibling.",
+   "package": "4-pin module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "VCC",
+     "type": "power",
+     "description": "3.3-5V"
+    },
+    {
+     "number": 2,
+     "name": "DATA",
+     "type": "digital",
+     "description": "Single-wire data, needs 10k pull-up"
+    },
+    {
+     "number": 3,
+     "name": "NC",
+     "type": "nc",
+     "description": "Not connected (bare sensor)"
+    },
+    {
+     "number": 4,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "sensor",
+    "digital",
+    "temperature",
+    "humidity"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "DATA",
+       "to_pin": "D2",
+       "note": "10kΩ pull-up to VCC"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "Many DHT11 modules include the pull-up resistor already."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">DHT11 Temperature &amp; Hu</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D2</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">DATA</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">10kΩ pull-up to VCC</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "3V3",
+       "note": ""
+      },
+      {
+       "from_pin": "DATA",
+       "to_pin": "GPIO4",
+       "note": "10kΩ pull-up to 3V3"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">DHT11 Temperature &amp; Hu</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">3V3</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO4</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">DATA</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">10kΩ pull-up to 3V3</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Read temperature & humidity (DHT11)",
+     "description": "",
+     "libraries": [
+      "DHT sensor library (Adafruit)",
+      "Adafruit Unified Sensor"
+     ],
+     "code": "#include <DHT.h>\n\n#define DHT_PIN 2\n#define DHT_TYPE DHT11\n\nDHT dht(DHT_PIN, DHT_TYPE);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  float humidity = dht.readHumidity();\n  float tempC = dht.readTemperature();\n  if (isnan(humidity) || isnan(tempC)) {\n    Serial.println(\"Sensor read failed\");\n  } else {\n    Serial.print(\"Temp: \"); Serial.print(tempC); Serial.print(\" C  \");\n    Serial.print(\"Humidity: \"); Serial.print(humidity); Serial.println(\" %\");\n  }\n  delay(2000);\n}\n"
+    },
+    "esp32": {
+     "title": "Read temperature & humidity (DHT11 on ESP32)",
+     "description": "",
+     "libraries": [
+      "DHT sensor library (Adafruit)",
+      "Adafruit Unified Sensor"
+     ],
+     "code": "#include <DHT.h>\n\n#define DHT_PIN 4\n#define DHT_TYPE DHT11\n\nDHT dht(DHT_PIN, DHT_TYPE);\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n}\n\nvoid loop() {\n  float humidity = dht.readHumidity();\n  float tempC = dht.readTemperature();\n  if (isnan(humidity) || isnan(tempC)) {\n    Serial.println(\"Sensor read failed\");\n  } else {\n    Serial.printf(\"Temp: %.1f C  Humidity: %.1f %%\\n\", tempC, humidity);\n  }\n  delay(2000);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "hcsr04",
+   "type": "sensor",
+   "name": "HC-SR04 Ultrasonic Distance Sensor",
+   "aliases": [
+    "hc-sr04",
+    "hcsr04",
+    "ultrasonic sensor",
+    "distance sensor"
+   ],
+   "description": "An ultrasonic ranging module. Emit a trigger pulse, then time the echo to compute distance (2cm-400cm).",
+   "package": "4-pin module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "VCC",
+     "type": "power",
+     "description": "5V"
+    },
+    {
+     "number": 2,
+     "name": "TRIG",
+     "type": "digital",
+     "description": "Trigger input"
+    },
+    {
+     "number": 3,
+     "name": "ECHO",
+     "type": "digital",
+     "description": "Echo output (5V!)"
+    },
+    {
+     "number": 4,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "sensor",
+    "distance"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "TRIG",
+       "to_pin": "D9",
+       "note": ""
+      },
+      {
+       "from_pin": "ECHO",
+       "to_pin": "D10",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">HC-SR04 Ultrasonic Dis</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D9</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">TRIG</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D10</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">ECHO</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V (VIN)",
+       "note": "Sensor needs 5V"
+      },
+      {
+       "from_pin": "TRIG",
+       "to_pin": "GPIO5",
+       "note": ""
+      },
+      {
+       "from_pin": "ECHO",
+       "to_pin": "GPIO18",
+       "note": "Use a divider: ECHO is 5V!"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [
+      "ECHO outputs 5V — drop to 3.3V with a 1k/2k divider on ESP32."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">HC-SR04 Ultrasonic Dis</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V (VIN)</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Sensor needs 5V</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO5</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">TRIG</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO18</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">ECHO</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Use a divider: ECHO is 5V!</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Measure distance (HC-SR04)",
+     "description": "",
+     "libraries": [],
+     "code": "const int TRIG_PIN = 9;\nconst int ECHO_PIN = 10;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n\n  long duration = pulseIn(ECHO_PIN, HIGH);\n  float distanceCm = duration * 0.0343 / 2.0;\n  Serial.print(\"Distance: \");\n  Serial.print(distanceCm);\n  Serial.println(\" cm\");\n  delay(200);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "hcsr501",
+   "type": "sensor",
+   "name": "HC-SR501 PIR Motion Sensor",
+   "aliases": [
+    "pir",
+    "hc-sr501",
+    "motion sensor"
+   ],
+   "description": "A passive infrared motion detector. Outputs HIGH when motion is detected; on-board pots set sensitivity and hold time.",
+   "package": "3-pin module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "VCC",
+     "type": "power",
+     "description": "5-20V"
+    },
+    {
+     "number": 2,
+     "name": "OUT",
+     "type": "digital",
+     "description": "3.3V digital output"
+    },
+    {
+     "number": 3,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "sensor",
+    "motion",
+    "digital"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "OUT",
+       "to_pin": "D2",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">HC-SR501 PIR Motion Se</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D2</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">OUT</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V (VIN)",
+       "note": ""
+      },
+      {
+       "from_pin": "OUT",
+       "to_pin": "GPIO13",
+       "note": "Output is 3.3V, safe"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">HC-SR501 PIR Motion Se</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V (VIN)</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO13</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">OUT</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Output is 3.3V, safe</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Detect motion (PIR)",
+     "description": "",
+     "libraries": [],
+     "code": "const int PIR_PIN = 2;\n\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    Serial.println(\"Motion detected!\");\n  }\n  delay(200);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "sg90",
+   "type": "actuator",
+   "name": "SG90 Micro Servo",
+   "aliases": [
+    "sg90",
+    "servo",
+    "micro servo"
+   ],
+   "description": "A small hobby servo controlled with a 50Hz PWM signal. Position maps to pulse width (~1-2ms).",
+   "package": "Servo",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "Signal",
+     "type": "pwm",
+     "description": "Orange/yellow wire"
+    },
+    {
+     "number": 2,
+     "name": "VCC",
+     "type": "power",
+     "description": "Red wire, 4.8-6V"
+    },
+    {
+     "number": 3,
+     "name": "GND",
+     "type": "ground",
+     "description": "Brown/black wire"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "actuator",
+    "pwm"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "Signal",
+       "to_pin": "D9",
+       "note": "PWM-capable pin"
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": "Use external 5V if it stutters"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": "Share ground with the board"
+      }
+     ],
+     "notes": [
+      "Servos can draw >250mA; power from an external supply for reliability."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">SG90 Micro Servo</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D9</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Signal</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">PWM-capable pin</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Use external 5V if it stutters</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Share ground with the board</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "Signal",
+       "to_pin": "GPIO13",
+       "note": ""
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V (VIN)",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">SG90 Micro Servo</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO13</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">Signal</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V (VIN)</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Sweep a servo",
+     "description": "",
+     "libraries": [
+      "Servo (built-in)"
+     ],
+     "code": "#include <Servo.h>\n\nServo myServo;\n\nvoid setup() {\n  myServo.attach(9);\n}\n\nvoid loop() {\n  for (int angle = 0; angle <= 180; angle++) {\n    myServo.write(angle);\n    delay(15);\n  }\n  for (int angle = 180; angle >= 0; angle--) {\n    myServo.write(angle);\n    delay(15);\n  }\n}\n"
+    },
+    "esp32": {
+     "title": "Sweep a servo (ESP32)",
+     "description": "",
+     "libraries": [
+      "ESP32Servo"
+     ],
+     "code": "#include <ESP32Servo.h>\n\nServo myServo;\n\nvoid setup() {\n  myServo.attach(13);\n}\n\nvoid loop() {\n  for (int angle = 0; angle <= 180; angle++) {\n    myServo.write(angle);\n    delay(15);\n  }\n  for (int angle = 180; angle >= 0; angle--) {\n    myServo.write(angle);\n    delay(15);\n  }\n}\n"
+    }
+   }
+  },
+  {
+   "id": "ssd1306",
+   "type": "module",
+   "name": "SSD1306 OLED Display (I2C)",
+   "aliases": [
+    "ssd1306",
+    "oled",
+    "oled display",
+    "128x64 oled"
+   ],
+   "description": "A 128x64 monochrome OLED display driven over I2C. Default address is 0x3C.",
+   "package": "I2C module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    },
+    {
+     "number": 2,
+     "name": "VCC",
+     "type": "power",
+     "description": "3.3-5V"
+    },
+    {
+     "number": 3,
+     "name": "SCL",
+     "type": "i2c",
+     "description": "I2C clock"
+    },
+    {
+     "number": 4,
+     "name": "SDA",
+     "type": "i2c",
+     "description": "I2C data"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "display",
+    "i2c"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "SCL",
+       "to_pin": "A5",
+       "note": "Hardware I2C SCL"
+      },
+      {
+       "from_pin": "SDA",
+       "to_pin": "A4",
+       "note": "Hardware I2C SDA"
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">SSD1306 OLED Display (</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">A5</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SCL</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Hardware I2C SCL</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">A4</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SDA</text><text x=\"260.0\" y=\"254\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Hardware I2C SDA</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "VCC",
+       "to_pin": "3V3",
+       "note": ""
+      },
+      {
+       "from_pin": "SCL",
+       "to_pin": "GPIO22",
+       "note": "Default I2C SCL"
+      },
+      {
+       "from_pin": "SDA",
+       "to_pin": "GPIO21",
+       "note": "Default I2C SDA"
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">SSD1306 OLED Display (</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">3V3</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO22</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SCL</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Default I2C SCL</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO21</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SDA</text><text x=\"260.0\" y=\"254\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Default I2C SDA</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Print text on an OLED",
+     "description": "",
+     "libraries": [
+      "Adafruit SSD1306",
+      "Adafruit GFX Library"
+     ],
+     "code": "#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\n#define SCREEN_WIDTH 128\n#define SCREEN_HEIGHT 64\nAdafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);\n\nvoid setup() {\n  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);\n  display.clearDisplay();\n  display.setTextSize(2);\n  display.setTextColor(SSD1306_WHITE);\n  display.setCursor(0, 0);\n  display.println(\"Hello!\");\n  display.display();\n}\n\nvoid loop() {}\n"
+    }
+   }
+  },
+  {
+   "id": "mpu6050",
+   "type": "sensor",
+   "name": "MPU-6050 Accelerometer + Gyroscope",
+   "aliases": [
+    "mpu6050",
+    "mpu-6050",
+    "imu",
+    "accelerometer",
+    "gyroscope"
+   ],
+   "description": "A 6-axis inertial measurement unit (3-axis accelerometer + 3-axis gyro) over I2C. Default address 0x68.",
+   "package": "I2C module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "VCC",
+     "type": "power",
+     "description": "3.3-5V (onboard regulator)"
+    },
+    {
+     "number": 2,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    },
+    {
+     "number": 3,
+     "name": "SCL",
+     "type": "i2c",
+     "description": "I2C clock"
+    },
+    {
+     "number": 4,
+     "name": "SDA",
+     "type": "i2c",
+     "description": "I2C data"
+    },
+    {
+     "number": 5,
+     "name": "XDA",
+     "type": "i2c",
+     "description": "Auxiliary I2C data (optional)"
+    },
+    {
+     "number": 6,
+     "name": "XCL",
+     "type": "i2c",
+     "description": "Auxiliary I2C clock (optional)"
+    },
+    {
+     "number": 7,
+     "name": "AD0",
+     "type": "digital",
+     "description": "Address select (LOW=0x68)"
+    },
+    {
+     "number": 8,
+     "name": "INT",
+     "type": "digital",
+     "description": "Interrupt output"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "sensor",
+    "i2c",
+    "imu"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "SCL",
+       "to_pin": "A5",
+       "note": ""
+      },
+      {
+       "from_pin": "SDA",
+       "to_pin": "A4",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">MPU-6050 Accelerometer</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">A5</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SCL</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">A4</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SDA</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "3V3",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "SCL",
+       "to_pin": "GPIO22",
+       "note": ""
+      },
+      {
+       "from_pin": "SDA",
+       "to_pin": "GPIO21",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">MPU-6050 Accelerometer</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">3V3</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO22</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SCL</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO21</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">SDA</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Read acceleration (MPU-6050)",
+     "description": "",
+     "libraries": [
+      "Adafruit MPU6050",
+      "Adafruit Unified Sensor"
+     ],
+     "code": "#include <Adafruit_MPU6050.h>\n#include <Adafruit_Sensor.h>\n#include <Wire.h>\n\nAdafruit_MPU6050 mpu;\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!mpu.begin()) {\n    Serial.println(\"MPU6050 not found\");\n    while (1) delay(10);\n  }\n}\n\nvoid loop() {\n  sensors_event_t a, g, temp;\n  mpu.getEvent(&a, &g, &temp);\n  Serial.print(\"aX: \"); Serial.print(a.acceleration.x);\n  Serial.print(\"  aY: \"); Serial.print(a.acceleration.y);\n  Serial.print(\"  aZ: \"); Serial.println(a.acceleration.z);\n  delay(200);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "hc05",
+   "type": "module",
+   "name": "HC-05 Bluetooth Module",
+   "aliases": [
+    "hc-05",
+    "hc05",
+    "bluetooth module"
+   ],
+   "description": "A Bluetooth SPP (serial) module. Communicates over UART. The RX pin is 3.3V — use a divider from the board's TX.",
+   "package": "6-pin module",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "EN/KEY",
+     "type": "digital",
+     "description": "AT mode enable"
+    },
+    {
+     "number": 2,
+     "name": "VCC",
+     "type": "power",
+     "description": "3.6-6V"
+    },
+    {
+     "number": 3,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    },
+    {
+     "number": 4,
+     "name": "TXD",
+     "type": "uart",
+     "description": "Module transmit (to board RX)"
+    },
+    {
+     "number": 5,
+     "name": "RXD",
+     "type": "uart",
+     "description": "Module receive (3.3V!)"
+    },
+    {
+     "number": 6,
+     "name": "STATE",
+     "type": "digital",
+     "description": "Connection state"
+    }
+   ],
+   "supported_boards": [
+    "uno"
+   ],
+   "tags": [
+    "module",
+    "bluetooth",
+    "uart"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "TXD",
+       "to_pin": "D10",
+       "note": "SoftwareSerial RX"
+      },
+      {
+       "from_pin": "RXD",
+       "to_pin": "D11",
+       "note": "Via 1k/2k divider (3.3V)"
+      }
+     ],
+     "notes": [
+      "The module RXD is 3.3V — never drive it with raw 5V."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 314\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"314\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"204\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">HC-05 Bluetooth Module</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D10</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">TXD</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">SoftwareSerial RX</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D11</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">RXD</text><text x=\"260.0\" y=\"254\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Via 1k/2k divider (3.3V)</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Bluetooth serial bridge (HC-05)",
+     "description": "",
+     "libraries": [
+      "SoftwareSerial (built-in)"
+     ],
+     "code": "#include <SoftwareSerial.h>\n\nSoftwareSerial bt(10, 11); // RX, TX\n\nvoid setup() {\n  Serial.begin(9600);\n  bt.begin(9600);\n}\n\nvoid loop() {\n  if (bt.available()) Serial.write(bt.read());\n  if (Serial.available()) bt.write(Serial.read());\n}\n"
+    }
+   }
+  },
+  {
+   "id": "relay_module",
+   "type": "module",
+   "name": "Relay Module (1-channel)",
+   "aliases": [
+    "relay",
+    "relay module"
+   ],
+   "description": "An opto-isolated relay board that switches mains/high-current loads from a logic pin. Most are active-LOW.",
+   "package": "Relay board",
+   "datasheet_url": null,
+   "pins": [
+    {
+     "number": 1,
+     "name": "VCC",
+     "type": "power",
+     "description": "5V coil supply"
+    },
+    {
+     "number": 2,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground"
+    },
+    {
+     "number": 3,
+     "name": "IN",
+     "type": "digital",
+     "description": "Control input (often active-LOW)"
+    }
+   ],
+   "supported_boards": [
+    "uno",
+    "esp32"
+   ],
+   "tags": [
+    "module",
+    "actuator"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "IN",
+       "to_pin": "D7",
+       "note": "LOW usually turns the relay ON"
+      }
+     ],
+     "notes": [
+      "Never wire mains voltage without proper insulation and knowledge."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Relay Module (1-channe</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D7</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">IN</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">LOW usually turns the relay ON</text></svg>"
+    },
+    "esp32": {
+     "connections": [
+      {
+       "from_pin": "VCC",
+       "to_pin": "5V (VIN)",
+       "note": ""
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": ""
+      },
+      {
+       "from_pin": "IN",
+       "to_pin": "GPIO26",
+       "note": ""
+      }
+     ],
+     "notes": [],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 268\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"268\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">ESP32</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"158\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">Relay Module (1-channe</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V (VIN)</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GPIO26</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">IN</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Toggle a relay",
+     "description": "",
+     "libraries": [],
+     "code": "const int RELAY_PIN = 7;\n\nvoid setup() {\n  pinMode(RELAY_PIN, OUTPUT);\n  digitalWrite(RELAY_PIN, HIGH); // OFF for active-LOW modules\n}\n\nvoid loop() {\n  digitalWrite(RELAY_PIN, LOW);  // ON\n  delay(2000);\n  digitalWrite(RELAY_PIN, HIGH); // OFF\n  delay(2000);\n}\n"
+    }
+   }
+  },
+  {
+   "id": "l293d",
+   "type": "ic",
+   "name": "L293D Motor Driver",
+   "aliases": [
+    "l293d",
+    "motor driver",
+    "h-bridge"
+   ],
+   "description": "A dual H-bridge driver IC that can control two DC motors or one stepper. Handles up to 600mA per channel.",
+   "package": "DIP-16",
+   "datasheet_url": "https://www.ti.com/lit/ds/symlink/l293d.pdf",
+   "pins": [
+    {
+     "number": 1,
+     "name": "EN1,2",
+     "type": "digital",
+     "description": "Enable channel 1/2 (PWM)"
+    },
+    {
+     "number": 2,
+     "name": "IN1",
+     "type": "digital",
+     "description": "Input 1"
+    },
+    {
+     "number": 3,
+     "name": "OUT1",
+     "type": "signal",
+     "description": "Output 1 to motor A"
+    },
+    {
+     "number": 4,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground / heatsink"
+    },
+    {
+     "number": 5,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground / heatsink"
+    },
+    {
+     "number": 6,
+     "name": "OUT2",
+     "type": "signal",
+     "description": "Output 2 to motor A"
+    },
+    {
+     "number": 7,
+     "name": "IN2",
+     "type": "digital",
+     "description": "Input 2"
+    },
+    {
+     "number": 8,
+     "name": "VCC2",
+     "type": "power",
+     "description": "Motor supply (up to 36V)"
+    },
+    {
+     "number": 9,
+     "name": "EN3,4",
+     "type": "digital",
+     "description": "Enable channel 3/4 (PWM)"
+    },
+    {
+     "number": 10,
+     "name": "IN3",
+     "type": "digital",
+     "description": "Input 3"
+    },
+    {
+     "number": 11,
+     "name": "OUT3",
+     "type": "signal",
+     "description": "Output 3 to motor B"
+    },
+    {
+     "number": 12,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground / heatsink"
+    },
+    {
+     "number": 13,
+     "name": "GND",
+     "type": "ground",
+     "description": "Ground / heatsink"
+    },
+    {
+     "number": 14,
+     "name": "OUT4",
+     "type": "signal",
+     "description": "Output 4 to motor B"
+    },
+    {
+     "number": 15,
+     "name": "IN4",
+     "type": "digital",
+     "description": "Input 4"
+    },
+    {
+     "number": 16,
+     "name": "VCC1",
+     "type": "power",
+     "description": "Logic supply 5V"
+    }
+   ],
+   "supported_boards": [
+    "uno"
+   ],
+   "tags": [
+    "ic",
+    "motor",
+    "driver"
+   ],
+   "wiring": {
+    "uno": {
+     "connections": [
+      {
+       "from_pin": "VCC1",
+       "to_pin": "5V",
+       "note": "Logic supply"
+      },
+      {
+       "from_pin": "VCC2",
+       "to_pin": "Motor V+",
+       "note": "External motor supply"
+      },
+      {
+       "from_pin": "GND",
+       "to_pin": "GND",
+       "note": "Common ground with the board"
+      },
+      {
+       "from_pin": "EN1,2",
+       "to_pin": "D9",
+       "note": "PWM for speed"
+      },
+      {
+       "from_pin": "IN1",
+       "to_pin": "D8",
+       "note": "Direction"
+      },
+      {
+       "from_pin": "IN2",
+       "to_pin": "D7",
+       "note": "Direction"
+      }
+     ],
+     "notes": [
+      "Tie the motor supply ground to the Arduino ground."
+     ],
+     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 520 406\" font-family=\"Segoe UI, Roboto, sans-serif\"><rect x=\"0\" y=\"0\" width=\"520\" height=\"406\" fill=\"#fafafa\"/><rect x=\"40\" y=\"50\" width=\"180\" height=\"296\" rx=\"10\" fill=\"#e3f2fd\" stroke=\"#1565c0\" stroke-width=\"2\"/><text x=\"130.0\" y=\"72\" text-anchor=\"middle\" font-size=\"16\" font-weight=\"700\" fill=\"#0d47a1\">UNO</text><rect x=\"300\" y=\"50\" width=\"180\" height=\"296\" rx=\"10\" fill=\"#f1f8e9\" stroke=\"#2e7d32\" stroke-width=\"2\"/><text x=\"390.0\" y=\"72\" text-anchor=\"middle\" font-size=\"14\" font-weight=\"700\" fill=\"#1b5e20\">L293D Motor Driver</text><path d=\"M 220 102 C 260.0 102, 260.0 102, 300 102\" stroke=\"#e53935\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><circle cx=\"300\" cy=\"102\" r=\"4\" fill=\"#e53935\"/><text x=\"212\" y=\"96\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">5V</text><text x=\"308\" y=\"96\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC1</text><text x=\"260.0\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Logic supply</text><path d=\"M 220 148 C 260.0 148, 260.0 148, 300 148\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"148\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"142\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">Motor V+</text><text x=\"308\" y=\"142\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">VCC2</text><text x=\"260.0\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">External motor supply</text><path d=\"M 220 194 C 260.0 194, 260.0 194, 300 194\" stroke=\"#212121\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"194\" r=\"4\" fill=\"#212121\"/><circle cx=\"300\" cy=\"194\" r=\"4\" fill=\"#212121\"/><text x=\"212\" y=\"188\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">GND</text><text x=\"308\" y=\"188\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">GND</text><text x=\"260.0\" y=\"208\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Common ground with the board</text><path d=\"M 220 240 C 260.0 240, 260.0 240, 300 240\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"240\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"234\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D9</text><text x=\"308\" y=\"234\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">EN1,2</text><text x=\"260.0\" y=\"254\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">PWM for speed</text><path d=\"M 220 286 C 260.0 286, 260.0 286, 300 286\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"286\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"286\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"280\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D8</text><text x=\"308\" y=\"280\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">IN1</text><text x=\"260.0\" y=\"300\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Direction</text><path d=\"M 220 332 C 260.0 332, 260.0 332, 300 332\" stroke=\"#1e88e5\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"220\" cy=\"332\" r=\"4\" fill=\"#1e88e5\"/><circle cx=\"300\" cy=\"332\" r=\"4\" fill=\"#1e88e5\"/><text x=\"212\" y=\"326\" text-anchor=\"end\" font-size=\"13\" font-weight=\"600\" fill=\"#0d47a1\">D7</text><text x=\"308\" y=\"326\" font-size=\"13\" font-weight=\"600\" fill=\"#1b5e20\">IN2</text><text x=\"260.0\" y=\"346\" text-anchor=\"middle\" font-size=\"10\" fill=\"#616161\">Direction</text></svg>"
+    }
+   },
+   "code": {
+    "uno": {
+     "title": "Drive a DC motor (L293D)",
+     "description": "",
+     "libraries": [],
+     "code": "const int EN = 9;   // PWM\nconst int IN1 = 8;\nconst int IN2 = 7;\n\nvoid setup() {\n  pinMode(EN, OUTPUT);\n  pinMode(IN1, OUTPUT);\n  pinMode(IN2, OUTPUT);\n}\n\nvoid loop() {\n  // Forward at ~75% speed\n  digitalWrite(IN1, HIGH);\n  digitalWrite(IN2, LOW);\n  analogWrite(EN, 190);\n  delay(2000);\n\n  // Stop\n  analogWrite(EN, 0);\n  delay(1000);\n\n  // Reverse\n  digitalWrite(IN1, LOW);\n  digitalWrite(IN2, HIGH);\n  analogWrite(EN, 190);\n  delay(2000);\n}\n"
+    }
+   }
+  }
+ ]
+}

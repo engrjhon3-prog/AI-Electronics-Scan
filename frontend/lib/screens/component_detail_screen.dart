@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../models/component.dart';
 import '../models/wiring.dart';
-import '../services/api_client.dart';
 import '../state/app_state.dart';
 import '../widgets/code_block.dart';
 import '../widgets/pinout_table.dart';
@@ -12,6 +11,9 @@ import '../widgets/premium_lock.dart';
 import '../widgets/type_badge.dart';
 import 'paywall_screen.dart';
 
+/// Component detail: Overview (pinout) / Wiring / Code tabs.
+/// All data comes from the bundled offline knowledge base; Wiring and Code
+/// are Pro features gated locally through AppState.
 class ComponentDetailScreen extends StatefulWidget {
   final String componentId;
   const ComponentDetailScreen({super.key, required this.componentId});
@@ -23,15 +25,12 @@ class ComponentDetailScreen extends StatefulWidget {
 class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
-  Component? _component;
-  String? _error;
-  String _board = 'uno';
+  String? _board;
 
   @override
   void initState() {
     super.initState();
     _tabs = TabController(length: 3, vsync: this);
-    _load();
   }
 
   @override
@@ -40,64 +39,53 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     super.dispose();
   }
 
-  Future<void> _load() async {
-    final api = context.read<AppState>().api;
-    try {
-      final comp = await api.getComponent(widget.componentId);
-      setState(() {
-        _component = comp;
-        if (comp.supportedBoards.isNotEmpty) {
-          _board = comp.supportedBoards.first;
-        }
-      });
-    } on ApiException catch (e) {
-      setState(() => _error = e.message);
-    } catch (e) {
-      setState(() => _error = '$e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final comp = _component;
+    final app = context.watch<AppState>();
+    final comp = app.getComponent(widget.componentId);
+
+    if (comp == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Component')),
+        body: const Center(child: Text('Component not found.')),
+      );
+    }
+
+    final board = _board ??
+        (comp.supportedBoards.isNotEmpty ? comp.supportedBoards.first : 'uno');
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(comp?.name ?? 'Component'),
-        bottom: comp == null
-            ? null
-            : TabBar(
-                controller: _tabs,
-                tabs: const [
-                  Tab(text: 'Overview'),
-                  Tab(text: 'Wiring'),
-                  Tab(text: 'Code'),
-                ],
-              ),
+        title: Text(comp.name),
+        bottom: TabBar(
+          controller: _tabs,
+          tabs: const [
+            Tab(text: 'Overview'),
+            Tab(text: 'Wiring'),
+            Tab(text: 'Code'),
+          ],
+        ),
       ),
-      body: _error != null
-          ? _ErrorView(message: _error!, onRetry: _load)
-          : comp == null
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    if (comp.supportedBoards.length > 1)
-                      _BoardSelector(
-                        boards: comp.supportedBoards,
-                        selected: _board,
-                        onChanged: (b) => setState(() => _board = b),
-                      ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabs,
-                        children: [
-                          _OverviewTab(component: comp),
-                          _WiringTab(componentId: comp.id, board: _board),
-                          _CodeTab(componentId: comp.id, board: _board),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          if (comp.supportedBoards.length > 1)
+            _BoardSelector(
+              boards: comp.supportedBoards,
+              selected: board,
+              onChanged: (b) => setState(() => _board = b),
+            ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabs,
+              children: [
+                _OverviewTab(component: comp),
+                _WiringTab(componentId: comp.id, board: board),
+                _CodeTab(componentId: comp.id, board: board),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -201,73 +189,22 @@ class _OverviewTab extends StatelessWidget {
   }
 }
 
-class _WiringTab extends StatefulWidget {
+class _WiringTab extends StatelessWidget {
   final String componentId;
   final String board;
   const _WiringTab({required this.componentId, required this.board});
 
   @override
-  State<_WiringTab> createState() => _WiringTabState();
-}
-
-class _WiringTabState extends State<_WiringTab> {
-  WiringDiagram? _diagram;
-  String? _error;
-  bool _locked = false;
-  bool _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void didUpdateWidget(covariant _WiringTab old) {
-    super.didUpdateWidget(old);
-    if (old.board != widget.board) _load();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-      _locked = false;
-    });
-    final app = context.read<AppState>();
-    try {
-      final d = await app.api.getWiring(widget.componentId, widget.board);
-      if (mounted) setState(() => _diagram = d);
-    } on PremiumRequiredException {
-      if (mounted) setState(() => _locked = true);
-    } on ApiException catch (e) {
-      if (mounted) setState(() => _error = e.message);
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
-    if (_locked) {
-      return Padding(
-        padding: const EdgeInsets.all(20),
-        child: PremiumLock(
-          feature: 'Wiring diagrams',
-          onUnlock: () async {
-            await Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PaywallScreen()));
-            _load();
-          },
-        ),
-      );
+    final app = context.watch<AppState>();
+    if (!app.isPremium) {
+      return _ProGate(feature: 'Wiring diagrams');
     }
-    if (_error != null) {
-      return _ErrorView(message: _error!, onRetry: _load);
+    final WiringDiagram? d = app.repo.getWiring(componentId, board);
+    if (d == null) {
+      return const Center(
+          child: Text('No wiring diagram for this board yet.'));
     }
-    final d = _diagram;
-    if (d == null) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -307,8 +244,7 @@ class _WiringTabState extends State<_WiringTab> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline,
-                      size: 16, color: scheme.secondary),
+                  Icon(Icons.info_outline, size: 16, color: scheme.secondary),
                   const SizedBox(width: 8),
                   Expanded(
                       child: Text(n, style: const TextStyle(fontSize: 13))),
@@ -322,73 +258,21 @@ class _WiringTabState extends State<_WiringTab> {
   }
 }
 
-class _CodeTab extends StatefulWidget {
+class _CodeTab extends StatelessWidget {
   final String componentId;
   final String board;
   const _CodeTab({required this.componentId, required this.board});
 
   @override
-  State<_CodeTab> createState() => _CodeTabState();
-}
-
-class _CodeTabState extends State<_CodeTab> {
-  CodeSnippet? _snippet;
-  String? _error;
-  bool _locked = false;
-  bool _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void didUpdateWidget(covariant _CodeTab old) {
-    super.didUpdateWidget(old);
-    if (old.board != widget.board) _load();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-      _locked = false;
-    });
-    final app = context.read<AppState>();
-    try {
-      final s = await app.api.getCode(widget.componentId, widget.board);
-      if (mounted) setState(() => _snippet = s);
-    } on PremiumRequiredException {
-      if (mounted) setState(() => _locked = true);
-    } on ApiException catch (e) {
-      if (mounted) setState(() => _error = e.message);
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
-    if (_locked) {
-      return Padding(
-        padding: const EdgeInsets.all(20),
-        child: PremiumLock(
-          feature: 'Code generation',
-          onUnlock: () async {
-            await Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PaywallScreen()));
-            _load();
-          },
-        ),
-      );
+    final app = context.watch<AppState>();
+    if (!app.isPremium) {
+      return _ProGate(feature: 'Code generation');
     }
-    if (_error != null) {
-      return _ErrorView(message: _error!, onRetry: _load);
+    final CodeSnippet? s = app.repo.getCode(componentId, board);
+    if (s == null) {
+      return const Center(child: Text('No code snippet for this board yet.'));
     }
-    final s = _snippet;
-    if (s == null) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -419,38 +303,25 @@ class _CodeTabState extends State<_CodeTab> {
           ),
         ],
         const SizedBox(height: 16),
-        CodeBlock(code: s.code, title: 'Sketch (${widget.board})'),
+        CodeBlock(code: s.code, title: 'Sketch ($board)'),
         const SizedBox(height: 24),
       ],
     );
   }
 }
 
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
+class _ProGate extends StatelessWidget {
+  final String feature;
+  const _ProGate({required this.feature});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.error_outline, size: 40, color: scheme.error),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: PremiumLock(
+        feature: feature,
+        onUnlock: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PaywallScreen())),
       ),
     );
   }

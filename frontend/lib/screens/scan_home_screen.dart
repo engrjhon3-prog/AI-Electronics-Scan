@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../config.dart';
 import '../models/scan_result.dart';
-import '../services/api_client.dart';
 import '../state/app_state.dart';
 import 'result_screen.dart';
 import 'paywall_screen.dart';
@@ -43,8 +42,6 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => ResultScreen(result: result, imagePath: file.path),
       ));
-    } on ApiException catch (e) {
-      _snack(e.message);
     } catch (e) {
       _snack('Something went wrong: $e');
     } finally {
@@ -90,8 +87,6 @@ class _ScanHomeScreenState extends State<ScanHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _ServerStatusBanner(reachable: app.serverReachable),
-              const SizedBox(height: 20),
               _ScanTarget(busy: _busy),
               const SizedBox(height: 28),
               Text('Identify a component',
@@ -178,38 +173,6 @@ class _ScanTarget extends StatelessWidget {
                   ],
                 ),
         ),
-      ),
-    );
-  }
-}
-
-class _ServerStatusBanner extends StatelessWidget {
-  final bool? reachable;
-  const _ServerStatusBanner({required this.reachable});
-
-  @override
-  Widget build(BuildContext context) {
-    if (reachable == null || reachable == true) {
-      return const SizedBox.shrink();
-    }
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: scheme.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.cloud_off, color: scheme.onErrorContainer, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Scanner service unreachable. Set your server URL in Settings.',
-              style: TextStyle(color: scheme.onErrorContainer, fontSize: 12.5),
-            ),
-          ),
-        ],
       ),
     );
   }

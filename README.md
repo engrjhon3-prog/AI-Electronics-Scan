@@ -7,35 +7,34 @@ hunt and start building.
 
 | | |
 |---|---|
-| **Frontend** | Flutter (Android APK; iOS-ready codebase) |
-| **Backend** | Python · FastAPI · OpenCV · Tesseract OCR |
-| **Hosting** | Any Docker host (built for Vast.ai) |
+| **App** | Flutter (Android APK; iOS-ready codebase) — **AI runs fully on-device, zero hosting cost** |
+| **Recognition** | Google ML Kit OCR (offline) + pure-Dart resistor colour-band decoder |
+| **Website** | GitHub Pages (free) — APK download + subscriptions |
+| **Backend (optional)** | Python · FastAPI · OpenCV · Tesseract — same pipeline, for future server-side scale |
 | **Monetisation** | Freemium — free scans & pinouts, Pro (~$3–5/mo) for wiring, code gen, unlimited scans & full history |
+
+**Website:** https://engrjhon3-prog.github.io/AI-Electronics-Scan/
 
 ---
 
 ## How it works
 
 ```
-┌────────────┐   photo    ┌─────────────────────────────┐
-│ Flutter app ├──────────►│ FastAPI backend             │
-│  (Android)  │           │  1. OCR silk-screen labels  │
-│             │◄──────────┤  2. Resistor colour bands   │
-└────────────┘  match +   │  3. Shape heuristics        │
-                pinout    │  → component knowledge base │
-                          └─────────────────────────────┘
+┌──────────────────────── Flutter app (all on-device) ────────────────────────┐
+│  photo ─► 1. ML Kit OCR reads silk-screen labels (NE555, HC-SR04, …)        │
+│           2. Dart colour-band decoder reads resistor values (10kΩ ±5%)      │
+│               ─► ranked matches ─► bundled knowledge base                   │
+│                   (pinouts · wiring SVGs · Arduino/ESP32 code)              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-The vision pipeline combines three signals:
+Everything works offline: the component knowledge base (with pre-rendered
+wiring diagrams) is exported from the backend into `frontend/assets/components.json`
+by `backend/scripts/export_assets.py` and ships inside the APK.
 
-1. **OCR** (Tesseract) reads part numbers printed on chips/modules (`NE555`,
-   `MPU-6050`, `HC-SR04`, …) and matches them against the knowledge base.
-2. **Colour-band decoding** (OpenCV) isolates a resistor body, samples its
-   bands, and computes the resistance value (e.g. `10kΩ ±5%`).
-3. **Shape heuristics** provide a low-confidence fallback and photo-quality tips.
-
-A trained CNN classifier can be added later as a fourth signal without touching
-the API (see `backend/app/vision/pipeline.py`).
+The Python backend implements the identical pipeline server-side (Tesseract
+OCR + OpenCV colour-band decoding) and remains in the repo as an optional
+upgrade path — e.g. for a future CNN classifier too heavy to run on-device.
 
 ## Repository layout
 
@@ -46,7 +45,7 @@ docs/        Deployment & architecture guides
 .github/     CI: tests + automatic APK builds
 ```
 
-## Quick start — backend
+## Quick start — backend (optional)
 
 ```bash
 cd backend
@@ -78,11 +77,11 @@ build that produces an installable APK:
 2. Download `ai-electronics-scanner.apk` on your phone and install it
    (allow "unknown sources" when prompted).
 
-To bake your backend server URL into the APK, set the repository variable
-`API_BASE_URL` (Settings → Secrets and variables → Actions → Variables) to e.g.
-`http://YOUR-VAST-IP:PORT`, then re-run the workflow. You can also pass the URL
-directly when triggering the workflow manually (Actions → Build & Test →
-Run workflow).
+Or just point people at the website — it links the same APK:
+https://engrjhon3-prog.github.io/AI-Electronics-Scan/
+
+(The optional `API_BASE_URL` repo variable only matters if you later deploy
+the server-side pipeline; the app itself is fully offline.)
 
 ## Freemium model
 

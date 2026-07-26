@@ -48,33 +48,13 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.dns_outlined),
-                  title: const Text('Backend server'),
-                  subtitle: Text(AppConfig.apiBaseUrl),
-                ),
-                ListTile(
-                  leading: Icon(
-                    app.serverReachable == true
-                        ? Icons.cloud_done_outlined
-                        : Icons.cloud_off_outlined,
-                    color: app.serverReachable == true
-                        ? Colors.green
-                        : scheme.error,
-                  ),
-                  title: Text(app.serverReachable == true
-                      ? 'Connected'
-                      : app.serverReachable == false
-                          ? 'Unreachable'
-                          : 'Checking…'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () => context.read<AppState>().checkServer(),
-                  ),
-                ),
-              ],
+            child: ListTile(
+              leading: Icon(Icons.offline_bolt_outlined,
+                  color: scheme.primary),
+              title: const Text('Works fully offline'),
+              subtitle: Text(
+                  'Recognition and the ${app.components.length}-component '
+                  'database run on your phone — no internet needed.'),
             ),
           ),
           const SizedBox(height: 12),
