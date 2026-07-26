@@ -22,3 +22,6 @@ firebase-service-account*.json
 
 # Local payment ledger (used when Firebase Admin isn't configured)
 payments-db.json
+
+# Local AI component cache (used when Firestore isn't configured)
+ai-components.json

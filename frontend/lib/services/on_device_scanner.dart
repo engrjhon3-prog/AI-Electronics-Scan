@@ -22,6 +22,7 @@ class OnDeviceScanner {
   Future<ScanResult> scan(File image) async {
     final notes = <String>[];
     final candidates = <DetectionCandidate>[];
+    var ocrText = '';
     final scanId = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
 
     // --- Signal 1: OCR part numbers. ---
@@ -30,6 +31,7 @@ class OnDeviceScanner {
       final result =
           await recognizer.processImage(InputImage.fromFilePath(image.path));
       await recognizer.close();
+      ocrText = result.text;
 
       final tokens = <String>{};
       for (final match in _tokenPattern.allMatches(result.text)) {
@@ -95,6 +97,7 @@ class OnDeviceScanner {
       bestMatch: candidates.isEmpty ? null : candidates.first,
       candidates: candidates,
       notes: notes,
+      ocrText: ocrText,
     );
   }
 }

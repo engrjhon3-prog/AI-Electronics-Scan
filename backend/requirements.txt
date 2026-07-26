@@ -14,3 +14,5 @@ httpx==0.28.1
 # Optional at runtime — without it (or without credentials) payments fall back
 # to a local JSON ledger.
 firebase-admin==6.6.0
+# Vision model that identifies components missing from the bundled catalog.
+anthropic==0.75.0

@@ -84,5 +84,29 @@ class Settings:
     # Fallback ledger used when Firebase is not configured (dev / tests).
     payments_db_path: str = os.environ.get("PAYMENTS_DB_PATH", "payments-db.json")
 
+    # ----------------------------------------------------- AI identification
+    # Key for the Claude API, used to identify components that aren't in the
+    # bundled catalog. Without it the app still works — it just falls back to
+    # the on-device catalog only.
+    anthropic_api_key: str = os.environ.get("ANTHROPIC_API_KEY", "")
+
+    # Vision model that writes the component entry. Opus is the most accurate
+    # on obscure parts; set AI_MODEL=claude-sonnet-5 to trade some accuracy
+    # for roughly half the cost.
+    ai_model: str = os.environ.get("AI_MODEL", "claude-opus-5")
+
+    # Reasoning depth: low | medium | high | xhigh | max.
+    ai_effort: str = os.environ.get("AI_EFFORT", "medium")
+
+    # Output ceiling for one identification (pinout + wiring + sketches).
+    ai_max_tokens: int = int(os.environ.get("AI_MAX_TOKENS", 32000))
+
+    # Only cache identifications at least this confident, so a guess never
+    # becomes the answer everyone else receives.
+    ai_cache_threshold: float = float(os.environ.get("AI_CACHE_THRESHOLD", 0.6))
+
+    # Local cache file used when Firestore isn't configured.
+    ai_cache_path: str = os.environ.get("AI_CACHE_PATH", "ai-components.json")
+
 
 settings = Settings()

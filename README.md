@@ -7,8 +7,9 @@ hunt and start building.
 
 | | |
 |---|---|
-| **App** | Flutter (Android APK; iOS-ready codebase) — **AI runs fully on-device, zero hosting cost** |
+| **App** | Flutter (Android APK; iOS-ready codebase) — **scanning runs on-device, zero hosting cost** |
 | **Recognition** | Google ML Kit OCR (offline) + pure-Dart resistor colour-band decoder |
+| **Beyond the catalog** | Claude vision identifies parts the bundled catalog has never seen — and writes their pinout, wiring and code |
 | **Website** | GitHub Pages (free) — APK download + subscriptions |
 | **Backend (optional)** | Python · FastAPI · OpenCV · Tesseract — same pipeline, for future server-side scale |
 | **Payments** | **GCash** via PayMongo — Pro activates automatically, no admin approval |
@@ -26,12 +27,23 @@ hunt and start building.
 │           2. Dart colour-band decoder reads resistor values (10kΩ ±5%)      │
 │               ─► ranked matches ─► bundled knowledge base                   │
 │                   (pinouts · wiring SVGs · Arduino/ESP32 code)              │
+└──────────────────────────────────┬──────────────────────────────────────────┘
+                            no match / wrong part
+                                   ▼
+┌───────────────────── AI fallback (Pro, backend) ────────────────────────────┐
+│  photo + OCR text ─► Claude vision ─► full component entry ─► cached        │
+│      merged into the phone's catalog, so it works offline from then on      │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 Everything works offline: the component knowledge base (with pre-rendered
 wiring diagrams) is exported from the backend into `frontend/assets/components.json`
 by `backend/scripts/export_assets.py` and ships inside the APK.
+
+The catalog is the fast path, not the ceiling. Anything it doesn't know goes to
+the AI, which writes a proper entry — pinout, wiring, sketch — and the result is
+cached server-side, so each new part is paid for once and then belongs to
+everybody. See **[docs/AI_IDENTIFICATION.md](docs/AI_IDENTIFICATION.md)**.
 
 The Python backend implements the identical pipeline server-side (Tesseract
 OCR + OpenCV colour-band decoding) and remains in the repo as an optional
@@ -41,12 +53,13 @@ upgrade path — e.g. for a future CNN classifier too heavy to run on-device.
 
 ```
 backend/
+  app/ai/                   Claude vision identification + shared cache
   app/components/catalog/   knowledge base, one module per category
   app/payments/             GCash checkout, webhooks, entitlement writes
   app/vision/               OCR + resistor colour-band pipeline
 frontend/    Flutter app
 website/     GitHub Pages site (APK download, account, payment result pages)
-docs/        Deployment, Firebase and payment guides
+docs/        Deployment, Firebase, payment and AI guides
 .github/     CI: tests + automatic APK builds
 ```
 
@@ -94,9 +107,10 @@ the server-side pipeline; the app itself is fully offline.)
 |---|---|---|
 | Component scans | 20 / month | Unlimited |
 | Pinout reference | ✅ | ✅ |
-| Component catalog | ✅ | ✅ |
+| Component catalog (179 parts) | ✅ | ✅ |
 | Wiring diagrams | — | ✅ |
 | Arduino/ESP32 code generation | — | ✅ |
+| **AI identification of any other part** | — | ✅ |
 | Scan history | Last 3 | Full |
 
 ### Paying with GCash (no admin approval)
@@ -118,9 +132,9 @@ Prices, plans and the gateway all come from the server
 gateway keys, Firebase Admin credentials, testing with the built-in mock
 gateway — is in **[docs/GCASH_PAYMENTS.md](docs/GCASH_PAYMENTS.md)**.
 
-Enforcement stays server-side: wiring and code endpoints return **HTTP 402**
-without a live entitlement (`backend/app/main.py::_require_premium` accepts a
-Firebase ID token whose account has one).
+Enforcement stays server-side: wiring, code and AI identification return
+**HTTP 402** without a live entitlement (`backend/app/security.py::require_premium`
+accepts a Firebase ID token whose account has one).
 
 ## Component knowledge base
 
@@ -148,6 +162,18 @@ battery sensors and Wi-Fi relay control.
 Adding a component = appending one dict to the right module in
 `backend/app/components/catalog/`, then re-running
 `python scripts/export_assets.py` to refresh the bundled asset.
+
+### …and everything else
+
+Curating by hand doesn't scale to the whole world of components, and it isn't
+meant to. Anything outside these 179 is handled by AI identification: the photo
+goes to Claude's vision model, which writes the same kind of entry — pinout,
+per-board wiring, working sketch — that a curated part has. The result is
+cached, so the second person to scan that part gets it instantly and free, and
+it's saved onto the phone so it works offline afterwards.
+
+Set `ANTHROPIC_API_KEY` on the backend to switch it on; full details, cost and
+tuning in **[docs/AI_IDENTIFICATION.md](docs/AI_IDENTIFICATION.md)**.
 
 ## Safety
 

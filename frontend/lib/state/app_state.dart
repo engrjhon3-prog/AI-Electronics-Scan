@@ -9,6 +9,7 @@ import '../models/entitlement.dart';
 import '../models/history_entry.dart';
 import '../models/scan_result.dart';
 import '../models/wiring.dart';
+import '../services/ai_identify_service.dart';
 import '../services/api_client.dart' show PremiumRequiredException;
 import '../services/auth_service.dart';
 import '../services/cloud_uploads_service.dart';
@@ -31,11 +32,13 @@ class AppState extends ChangeNotifier {
     SubscriptionService? subscription,
     AuthService? auth,
     PaymentService? payments,
+    AiIdentifyService? ai,
   })  : repo = repository ?? LocalRepository(),
         _history = history ?? HistoryService(),
         subscription = subscription ?? SubscriptionService(),
         auth = auth ?? AuthService(),
-        payments = payments ?? PaymentService() {
+        payments = payments ?? PaymentService(),
+        ai = ai ?? AiIdentifyService() {
     _scanner = scanner ?? OnDeviceScanner(repo);
   }
 
@@ -45,7 +48,11 @@ class AppState extends ChangeNotifier {
   final SubscriptionService subscription;
   final AuthService auth;
   final PaymentService payments;
+  final AiIdentifyService ai;
   final CloudUploadsService uploads = CloudUploadsService();
+
+  /// Whether the backend can identify parts outside the bundled catalog.
+  AiStatus aiStatus = AiStatus.offline;
 
   /// Outcome of the most recent cloud save ("saved, expires in 12h" /
   /// quota message). Shown on the result screen.
@@ -77,6 +84,7 @@ class AppState extends ChangeNotifier {
     _historyEntries = await _history.load();
     _initialised = true;
     notifyListeners();
+    refreshAiStatus();
     if (auth.isAvailable) {
       _authSub = auth.authStateChanges().listen(_onAuthChanged);
     }
@@ -172,6 +180,46 @@ class AppState extends ChangeNotifier {
     if (!isPremium) throw PremiumRequiredException();
     return repo.getCode(id, board);
   }
+
+  // -------------------------------------------------------------------- ai
+  /// Ask the backend whether AI identification is switched on.
+  Future<void> refreshAiStatus() async {
+    final status = await ai.status();
+    if (status.available != aiStatus.available ||
+        status.cachedComponents != aiStatus.cachedComponents) {
+      aiStatus = status;
+      notifyListeners();
+    }
+  }
+
+  /// Identify a component the bundled catalog doesn't know.
+  ///
+  /// The photo and the OCR text go to the backend's vision model, which writes
+  /// a full entry — pinout, wiring, code. The result is merged into the local
+  /// catalog and saved on the device, so the part works offline from now on
+  /// and shows up in search and history like any other component.
+  Future<AiIdentification> identifyWithAi(
+    File image, {
+    String ocrText = '',
+    String hint = '',
+  }) async {
+    final result = await ai.identify(
+      image: image,
+      ocrText: ocrText,
+      hint: hint,
+      idToken: await auth.idToken(),
+    );
+    if (result.component.isNotEmpty && result.componentId.isNotEmpty) {
+      await repo.addLearned(result.component);
+      notifyListeners();
+    }
+    return result;
+  }
+
+  /// How many components the AI has added to this device's catalog.
+  int get learnedComponentCount => repo.learnedCount;
+
+  bool isAiComponent(String id) => repo.isLearned(id);
 
   // ------------------------------------------------------------------ scan
   /// Run on-device recognition, record the scan in history, and (when signed

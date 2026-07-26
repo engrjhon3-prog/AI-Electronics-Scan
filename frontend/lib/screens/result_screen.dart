@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/scan_result.dart';
+import '../services/ai_identify_service.dart';
 import '../state/app_state.dart';
 import '../widgets/confidence_bar.dart';
 import '../widgets/type_badge.dart';
 import 'component_detail_screen.dart';
+import 'paywall_screen.dart';
 
 /// Shows the outcome of a scan: best match, alternatives, and vision notes.
 class ResultScreen extends StatelessWidget {
@@ -57,6 +59,14 @@ class ResultScreen extends StatelessWidget {
             _BestMatchCard(match: result.bestMatch!)
           else
             _NoMatchCard(notes: result.notes),
+          if (context.watch<AppState>().aiStatus.available) ...[
+            const SizedBox(height: 16),
+            AiIdentifyCard(
+              imagePath: imagePath,
+              ocrText: result.ocrText,
+              matched: result.hasMatch,
+            ),
+          ],
           if (result.candidates.length > 1) ...[
             const SizedBox(height: 20),
             Text('Other possibilities',
@@ -226,6 +236,170 @@ class _NotesCard extends StatelessWidget {
                     style: TextStyle(
                         color: scheme.onSurfaceVariant, fontSize: 12.5)),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+/// Hands the photo to the AI when the bundled catalog comes up short.
+///
+/// The on-device catalog covers the common parts; this covers everything else.
+/// A successful identification is merged into the local catalog and saved on
+/// the device, so the part is available offline from then on.
+class AiIdentifyCard extends StatefulWidget {
+  final String imagePath;
+  final String ocrText;
+
+  /// True when the on-device scanner already matched something — the AI is
+  /// then offered as a second opinion rather than the main action.
+  final bool matched;
+
+  const AiIdentifyCard({
+    super.key,
+    required this.imagePath,
+    required this.ocrText,
+    required this.matched,
+  });
+
+  @override
+  State<AiIdentifyCard> createState() => _AiIdentifyCardState();
+}
+
+class _AiIdentifyCardState extends State<AiIdentifyCard> {
+  bool _busy = false;
+  String? _error;
+  AiIdentification? _result;
+
+  Future<void> _identify() async {
+    final app = context.read<AppState>();
+    setState(() {
+      _busy = true;
+      _error = null;
+      _result = null;
+    });
+    try {
+      final result = await app.identifyWithAi(
+        File(widget.imagePath),
+        ocrText: widget.ocrText,
+      );
+      if (!mounted) return;
+      setState(() => _result = result);
+      if (result.identified && result.componentId.isNotEmpty) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ComponentDetailScreen(componentId: result.componentId),
+        ));
+      }
+    } on AiException catch (e) {
+      if (!mounted) return;
+      if (e.requiresPro) {
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PaywallScreen()));
+      }
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final app = context.watch<AppState>();
+    final result = _result;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.auto_awesome, color: scheme.secondary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.matched
+                        ? 'Not the right part?'
+                        : 'Identify it with AI',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 15),
+                  ),
+                ),
+                if (!app.isPremium)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: scheme.secondary.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text('PRO',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: scheme.secondary)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The catalog on your phone covers the common parts. This sends '
+              'the photo to our AI, which can work out almost any component — '
+              'and writes its pinout, wiring and code. Once identified, it is '
+              'saved on your device and works offline.',
+              style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant),
+            ),
+            if (result != null && !result.identified) ...[
+              const SizedBox(height: 12),
+              Text(
+                result.advice.isNotEmpty
+                    ? result.advice
+                    : "The AI couldn't name this part with confidence.",
+                style: TextStyle(fontSize: 13, color: scheme.error),
+              ),
+            ],
+            if (result != null && result.identified) ...[
+              const SizedBox(height: 12),
+              Text('${result.name} — ${result.reasoning}',
+                  style: const TextStyle(fontSize: 13)),
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(_error!,
+                  style: TextStyle(fontSize: 13, color: scheme.error)),
+            ],
+            const SizedBox(height: 14),
+            FilledButton.icon(
+              onPressed: _busy ? null : _identify,
+              icon: _busy
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.auto_awesome),
+              label: Text(_busy
+                  ? 'Working it out…'
+                  : result != null
+                      ? 'Try again'
+                      : 'Identify with AI'),
+              style:
+                  FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+            ),
+            if (_busy) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Reading the markings, package and pin layout — this takes '
+                'up to a minute.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+              ),
+            ],
           ],
         ),
       ),

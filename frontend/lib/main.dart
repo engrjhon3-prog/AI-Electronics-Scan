@@ -20,12 +20,16 @@ Future<void> main() async {
 }
 
 class ElectronicsScannerApp extends StatelessWidget {
-  const ElectronicsScannerApp({super.key});
+  const ElectronicsScannerApp({super.key, this.state});
+
+  /// Pre-built state, used by tests to keep the app off the network.
+  /// In the real app this is null and [AppState] builds its own services.
+  final AppState? state;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppState()..init(),
+      create: (_) => state ?? (AppState()..init()),
       child: MaterialApp(
         title: AppConfig.appName,
         debugShowCheckedModeBanner: false,

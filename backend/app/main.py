@@ -10,6 +10,7 @@ GET  /api/v1/components/{id}       -> component detail + pinout (FREE)
 GET  /api/v1/components/{id}/wiring?board=uno   -> wiring diagram (PREMIUM)
 GET  /api/v1/components/{id}/code?board=uno     -> code snippet   (PREMIUM)
 POST /api/v1/payments/checkout     -> GCash checkout URL (see app/payments)
+POST /api/v1/ai/identify           -> identify ANY component from a photo (PREMIUM)
 
 Premium access is proved either by a Firebase ID token (`Authorization:
 Bearer …`, checked against the entitlement a GCash payment wrote) or by the
@@ -26,9 +27,11 @@ from app.components import database as db
 from app.config import settings
 from app.generators import wiring_svg
 from app.models import Board, CodeSnippet, Component, ScanResult, WiringDiagram
-from app.payments import entitlements
+from app.ai import identifier as ai_identifier
+from app.ai.router import router as ai_router
 from app.payments.providers import get_provider
 from app.payments.router import router as payments_router
+from app.security import require_premium as _require_premium
 from app.vision import ocr
 from app.vision import pipeline
 
@@ -43,40 +46,8 @@ app.add_middleware(
 )
 
 
-def _require_premium(
-    x_premium_token: Optional[str] = Header(default=None),
-    authorization: Optional[str] = Header(default=None),
-) -> None:
-    """Gate premium features.
-
-    Accepts, in order:
-      1. A Firebase ID token (`Authorization: Bearer …`) whose account holds a
-         live entitlement — which is exactly what a paid GCash checkout writes.
-      2. The development token in `X-Premium-Token`.
-    """
-    if not settings.require_premium:
-        return
-    if x_premium_token and x_premium_token == settings.premium_dev_token:
-        return
-    if authorization and authorization.lower().startswith("bearer "):
-        claims = entitlements.verify_id_token(authorization.split(" ", 1)[1].strip())
-        if claims:
-            if claims.get("premium") is True or claims.get("admin") is True:
-                return
-            email = (claims.get("email") or "").lower()
-            record = entitlements.get_store().get_entitlement(email) if email else None
-            if record and record.get("premium"):
-                expires = entitlements._parse_dt(record.get("expiresAt"))
-                if expires is None or expires > entitlements._now():
-                    return
-    raise HTTPException(
-        status_code=402,
-        detail="This feature requires a Pro subscription. Subscribe with GCash "
-        "in the app, then retry with your account token.",
-    )
-
-
 app.include_router(payments_router)
+app.include_router(ai_router)
 
 
 @app.get("/")
@@ -87,6 +58,7 @@ def root() -> dict:
         "components": len(db.all_components()),
         "ocr_available": ocr.is_available(),
         "payments": get_provider().name,
+        "ai_identification": ai_identifier.is_available(),
         "docs": "/docs",
     }
 

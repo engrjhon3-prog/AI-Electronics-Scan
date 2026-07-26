@@ -102,7 +102,9 @@ jobs:
           body: |
             Automatic APK build from `${{ github.ref_name }}` @ `${{ github.sha }}`.
 
-            The AI runs fully on-device — no internet needed after install.
+            Scanning, the 179-component catalog, pinouts, wiring and code all
+            run on-device — no internet needed after install. Pro adds cloud AI
+            identification for parts the bundled catalog doesn't know.
 
             **Install:** download `ai-electronics-scanner.apk` on your Android
             phone, open it, and allow installation from unknown sources.

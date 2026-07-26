@@ -37,6 +37,10 @@ class ScanResult {
   final int imageWidth;
   final int imageHeight;
 
+  /// Raw text the on-device OCR read off the part. Passed to the AI fallback
+  /// as a strong hint when the bundled catalog has no match.
+  final String ocrText;
+
   const ScanResult({
     required this.scanId,
     this.bestMatch,
@@ -44,6 +48,7 @@ class ScanResult {
     this.notes = const [],
     this.imageWidth = 0,
     this.imageHeight = 0,
+    this.ocrText = '',
   });
 
   factory ScanResult.fromJson(Map<String, dynamic> json) => ScanResult(
@@ -60,6 +65,7 @@ class ScanResult {
         notes: (json['notes'] as List?)?.map((e) => e.toString()).toList() ?? [],
         imageWidth: json['image_width'] as int? ?? 0,
         imageHeight: json['image_height'] as int? ?? 0,
+        ocrText: json['ocr_text'] as String? ?? '',
       );
 
   bool get hasMatch => bestMatch != null;
