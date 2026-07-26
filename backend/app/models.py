@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 class ComponentType(str, Enum):
     resistor = "resistor"
     capacitor = "capacitor"
+    inductor = "inductor"
     led = "led"
     diode = "diode"
     transistor = "transistor"
@@ -21,6 +22,13 @@ class ComponentType(str, Enum):
     sensor = "sensor"
     module = "module"
     actuator = "actuator"
+    display = "display"
+    board = "board"
+    power = "power"
+    wireless = "wireless"
+    audio = "audio"
+    switch = "switch"
+    connector = "connector"
     unknown = "unknown"
 
 
@@ -89,6 +97,8 @@ class Component(BaseModel):
     # Boards for which we can generate wiring + code.
     supported_boards: List[Board] = []
     tags: List[str] = []
+    # Catalog section this part is filed under (see app/components/catalog).
+    category: str = ""
 
 
 class DetectionCandidate(BaseModel):

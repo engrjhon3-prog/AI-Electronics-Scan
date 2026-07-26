@@ -54,6 +54,7 @@ def main() -> None:
                 "pins": [p.model_dump() for p in comp.pins],
                 "supported_boards": [b.value for b in comp.supported_boards],
                 "tags": comp.tags,
+                "category": comp.category,
                 "wiring": wiring,
                 "code": code,
             }

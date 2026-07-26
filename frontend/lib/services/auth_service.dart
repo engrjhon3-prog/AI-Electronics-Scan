@@ -4,12 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '../models/entitlement.dart';
+
 /// Firebase-backed accounts and Pro entitlements.
 ///
 /// Entitlement model (see `firebase/firestore.rules`):
 ///  - Custom claims `admin` / `premium` on the ID token (set server-side).
-///  - `entitlements/{email}` documents with `{premium: true}` that admins can
-///    grant from the app or website after a customer subscribes.
+///  - `entitlements/{email}` documents with `{premium: true, expiresAt: …}`,
+///    written automatically by the payment backend when a GCash payment
+///    clears (and, for comped accounts, by an admin).
 ///
 /// The service is safe to use when Firebase isn't configured (e.g. tests):
 /// every method no-ops and `isAvailable` is false.
@@ -37,6 +40,18 @@ class AuthService {
   Future<void> sendPasswordReset(String email) => FirebaseAuth.instance
       .sendPasswordResetEmail(email: email.trim());
 
+  /// Current Firebase ID token — sent with a checkout so the backend can
+  /// prove the payment belongs to this account.
+  Future<String> idToken({bool refresh = false}) async {
+    final user = currentUser;
+    if (user == null) return '';
+    try {
+      return await user.getIdToken(refresh) ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   /// Read `admin` / `premium` custom claims, optionally forcing a token
   /// refresh (needed right after an admin changes claims).
   Future<({bool admin, bool premium})> readClaims({bool refresh = false}) async {
@@ -50,20 +65,22 @@ class AuthService {
     );
   }
 
-  /// Live entitlement stream for the signed-in user's email.
-  Stream<bool> entitlementStream(String email) => FirebaseFirestore.instance
+  /// Live entitlement stream for the signed-in user's email. Emits as soon as
+  /// a GCash payment is confirmed server-side.
+  Stream<Entitlement> entitlementStream(String email) => FirebaseFirestore
+      .instance
       .collection('entitlements')
       .doc(email.toLowerCase())
       .snapshots()
-      .map((snap) => snap.data()?['premium'] == true);
+      .map((snap) => Entitlement.fromMap(snap.data()));
 
   /// One-shot entitlement read.
-  Future<bool> fetchEntitlement(String email) async {
+  Future<Entitlement> fetchEntitlement(String email) async {
     final snap = await FirebaseFirestore.instance
         .collection('entitlements')
         .doc(email.toLowerCase())
         .get();
-    return snap.data()?['premium'] == true;
+    return Entitlement.fromMap(snap.data());
   }
 
   // ------------------------------------------------------------- admin ops

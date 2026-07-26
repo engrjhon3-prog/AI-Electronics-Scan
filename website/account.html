@@ -93,13 +93,20 @@
     <button id="signOutBtn" class="btn btn-ghost">Sign out</button>
   </div>
 
-  <!-- Subscribe info -->
+  <!-- Subscribe -->
   <div id="subscribeCard" class="card hidden">
-    <h2>Subscribe to Pro — $3.99/mo</h2>
+    <h2>Subscribe to Pro</h2>
     <p class="muted">
-      Email <a href="mailto:jhonisaacalegre@gmail.com" style="color:var(--teal)">jhonisaacalegre@gmail.com</a>
-      from your account email and we'll send payment options. Once payment is
-      confirmed, Pro activates on your account — tap “Refresh status” here or in the app.
+      Pay with GCash and Pro switches on automatically — usually within seconds
+      of the payment clearing. No email, no manual approval.
+    </p>
+    <div id="planList"></div>
+    <button id="payBtn" class="btn btn-primary">Pay with GCash</button>
+    <div id="payMsg" class="msg"></div>
+    <p id="payFallback" class="muted hidden" style="margin-top:12px">
+      In-app checkout is offline right now. Email
+      <a href="mailto:jhonisaacalegre@gmail.com" style="color:var(--teal)">jhonisaacalegre@gmail.com</a>
+      from your account email and we'll get you sorted.
     </p>
   </div>
 
@@ -184,19 +191,29 @@
       premium = token.claims.premium === true;
       admin = token.claims.admin === true;
     } catch (_) {}
+    let expires = null, planName = "";
     if (!premium && user.email) {
       try {
         const snap = await getDoc(doc(db, "entitlements", user.email.toLowerCase()));
-        premium = snap.exists() && snap.data().premium === true;
+        const data = snap.exists() ? snap.data() : null;
+        if (data && data.premium === true) {
+          expires = data.expiresAt && data.expiresAt.toDate ? data.expiresAt.toDate() : null;
+          planName = data.planName || "";
+          premium = !expires || expires > new Date();
+        }
       } catch (_) {}
     }
     $("planBadge").textContent = admin ? "ADMIN" : premium ? "PRO" : "FREE";
     $("planBadge").className = "badge " + (premium || admin ? "pro" : "free");
     $("proMsg").textContent = premium
-      ? "Pro is active — wiring diagrams, code generation, and 7-day cloud storage are unlocked in the app."
+      ? (planName ? planName + " — " : "Pro is active — ") +
+        (expires
+          ? "active until " + expires.toLocaleDateString()
+          : "wiring diagrams, code generation, and 7-day cloud storage are unlocked in the app.")
       : "No active subscription on this account yet.";
     show($("subscribeCard"), !premium && !admin);
     show($("adminCard"), admin);
+    if (!premium && !admin) loadPlans();
   }
 
   onAuthStateChanged(auth, (user) => {
@@ -205,6 +222,101 @@
     if (user) { $("userEmail").textContent = user.email || ""; refreshStatus(); }
     else { show($("subscribeCard"), false); show($("adminCard"), false); }
   });
+
+  // ------------------------------------------------------- GCash checkout
+  // Public URL of the payment backend (backend/app/payments). Leave empty to
+  // hide in-app checkout and fall back to the email route.
+  const PAYMENTS_BASE_URL = "";
+
+  let plans = [], selectedPlan = null, pollTimer = null;
+
+  async function loadPlans() {
+    if (!PAYMENTS_BASE_URL) return payUnavailable();
+    try {
+      const res = await fetch(PAYMENTS_BASE_URL + "/api/v1/payments/config");
+      const config = await res.json();
+      if (!config.enabled || !config.plans.length) return payUnavailable();
+      plans = config.plans;
+      selectedPlan = (plans.find((p) => p.badge) || plans[0]).id;
+      renderPlans();
+      show($("payFallback"), false);
+      $("payBtn").disabled = false;
+    } catch (_) {
+      payUnavailable();
+    }
+  }
+
+  function payUnavailable() {
+    $("planList").innerHTML = "";
+    $("payBtn").disabled = true;
+    show($("payFallback"), true);
+  }
+
+  function renderPlans() {
+    $("planList").innerHTML = plans.map((p) => `
+      <label style="display:flex;gap:10px;align-items:center;margin:10px 0;padding:12px;
+                    border:1.5px solid ${p.id === selectedPlan ? "var(--teal)" : "var(--border)"};
+                    border-radius:12px;cursor:pointer">
+        <input type="radio" name="plan" value="${p.id}" ${p.id === selectedPlan ? "checked" : ""}
+               style="width:auto">
+        <span style="flex:1">
+          <b>${p.name}</b>${p.badge ? ` <span class="badge pro" style="font-size:.7rem">${p.badge}</span>` : ""}
+          <br><span class="muted">${p.days ? p.days + " days of Pro" : "Lifetime access"}</span>
+        </span>
+        <b style="color:var(--teal)">${p.display_price}</b>
+      </label>`).join("");
+    $("planList").querySelectorAll("input[name=plan]").forEach((el) => {
+      el.onchange = () => { selectedPlan = el.value; renderPlans(); };
+    });
+  }
+
+  $("payBtn").onclick = async () => {
+    const user = auth.currentUser;
+    if (!user || !user.email) return msg($("payMsg"), "Sign in first.", false);
+    $("payBtn").disabled = true;
+    msg($("payMsg"), "Creating your GCash checkout…", true);
+    try {
+      const res = await fetch(PAYMENTS_BASE_URL + "/api/v1/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan_id: selectedPlan,
+          email: user.email,
+          uid: user.uid,
+          id_token: await user.getIdToken(),
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.detail || "Checkout failed.");
+      msg($("payMsg"), "Complete the payment in the GCash window, then come back here.", true);
+      window.open(body.checkout_url, "_blank", "noopener");
+      pollPayment(body.reference);
+    } catch (e) {
+      msg($("payMsg"), e.message || String(e), false);
+      $("payBtn").disabled = false;
+    }
+  };
+
+  function pollPayment(reference) {
+    clearInterval(pollTimer);
+    const started = Date.now();
+    pollTimer = setInterval(async () => {
+      if (Date.now() - started > 15 * 60 * 1000) return clearInterval(pollTimer);
+      try {
+        const res = await fetch(PAYMENTS_BASE_URL + "/api/v1/payments/status/" + reference);
+        const body = await res.json();
+        if (body.status === "paid") {
+          clearInterval(pollTimer);
+          msg($("payMsg"), "Payment received — Pro is active on your account!", true);
+          refreshStatus(true);
+        } else if (body.status === "failed" || body.status === "expired") {
+          clearInterval(pollTimer);
+          msg($("payMsg"), "That payment did not go through. Nothing was charged.", false);
+          $("payBtn").disabled = false;
+        }
+      } catch (_) { /* keep polling */ }
+    }, 3000);
+  }
 
   async function setPremium(value) {
     const email = $("custEmail").value.trim().toLowerCase();

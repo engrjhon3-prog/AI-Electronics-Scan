@@ -22,6 +22,22 @@ void main() {
       expect(repo.findByAlias('i found an hc-sr04 sensor'), 'hcsr04');
     });
 
+    test('ships the full catalog, including IoT modules', () async {
+      final repo = LocalRepository();
+      await repo.load();
+      expect(repo.components.length, greaterThanOrEqualTo(150));
+
+      final esp32 = repo.getComponent('esp32_devkit');
+      expect(esp32, isNotNull);
+      expect(esp32!.category, 'boards');
+
+      // A few of the parts an IoT build actually needs.
+      for (final id in ['lora_sx1278', 'nrf24l01', 'neo6m_gps', 'rc522']) {
+        expect(repo.getComponent(id), isNotNull, reason: '$id is missing');
+      }
+      expect(repo.findByAlias('a lora ra-02 module'), 'lora_sx1278');
+    });
+
     test('wiring diagrams include pre-rendered SVG', () async {
       final repo = LocalRepository();
       await repo.load();

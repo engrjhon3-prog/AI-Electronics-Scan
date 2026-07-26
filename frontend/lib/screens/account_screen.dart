@@ -174,6 +174,16 @@ class _AuthFormState extends State<_AuthForm> {
 class _ProfileView extends StatelessWidget {
   const _ProfileView();
 
+  /// "Pro Yearly — renews Mar 3, 2027" / "Free plan".
+  String _planLine(AppState app) {
+    if (app.isAdmin) return 'Admin • Pro plan';
+    if (!app.isPremium) return 'Free plan';
+    final plan = app.planName.isEmpty ? 'Pro plan' : app.planName;
+    final until = app.premiumUntil;
+    if (until == null) return '$plan — all features unlocked';
+    return '$plan — active until ${DateFormat('MMM d, y').format(until)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
@@ -192,11 +202,7 @@ class _ProfileView extends StatelessWidget {
             ),
             title: Text(email,
                 style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text(app.isAdmin
-                ? 'Admin • Pro plan'
-                : app.isPremium
-                    ? 'Pro plan — all features unlocked'
-                    : 'Free plan'),
+            subtitle: Text(_planLine(app)),
             trailing: IconButton(
               tooltip: 'Refresh subscription status',
               icon: const Icon(Icons.refresh),
@@ -218,11 +224,26 @@ class _ProfileView extends StatelessWidget {
               leading: Icon(Icons.workspace_premium, color: scheme.secondary),
               title: const Text('Upgrade to Pro'),
               subtitle: const Text(
-                  'Wiring diagrams, code generation, 7-day cloud storage'),
+                  'Pay with GCash — unlocks instantly, no waiting for approval'),
               trailing: FilledButton(
                 onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const PaywallScreen())),
                 child: const Text('Go Pro'),
+              ),
+            ),
+          )
+        else if (app.premiumUntil != null)
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.event_repeat, color: scheme.secondary),
+              title: const Text('Renew with GCash'),
+              subtitle: Text(
+                  'Renews to ${DateFormat('MMM d, y').format(app.premiumUntil!)} '
+                  '— pay early and the days stack.'),
+              trailing: OutlinedButton(
+                onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PaywallScreen())),
+                child: const Text('Renew'),
               ),
             ),
           ),

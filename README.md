@@ -11,7 +11,8 @@ hunt and start building.
 | **Recognition** | Google ML Kit OCR (offline) + pure-Dart resistor colour-band decoder |
 | **Website** | GitHub Pages (free) — APK download + subscriptions |
 | **Backend (optional)** | Python · FastAPI · OpenCV · Tesseract — same pipeline, for future server-side scale |
-| **Monetisation** | Freemium — free scans & pinouts, Pro (~$3–5/mo) for wiring, code gen, unlimited scans & full history |
+| **Payments** | **GCash** via PayMongo — Pro activates automatically, no admin approval |
+| **Monetisation** | Freemium — free scans & pinouts, Pro (₱199/mo, ₱1,499/yr, ₱2,999 lifetime) for wiring, code gen, unlimited scans & full history |
 
 **Website:** https://engrjhon3-prog.github.io/AI-Electronics-Scan/
 
@@ -39,9 +40,13 @@ upgrade path — e.g. for a future CNN classifier too heavy to run on-device.
 ## Repository layout
 
 ```
-backend/     Python FastAPI service (vision + knowledge base + generators)
+backend/
+  app/components/catalog/   knowledge base, one module per category
+  app/payments/             GCash checkout, webhooks, entitlement writes
+  app/vision/               OCR + resistor colour-band pipeline
 frontend/    Flutter app
-docs/        Deployment & architecture guides
+website/     GitHub Pages site (APK download, account, payment result pages)
+docs/        Deployment, Firebase and payment guides
 .github/     CI: tests + automatic APK builds
 ```
 
@@ -94,20 +99,55 @@ the server-side pipeline; the app itself is fully offline.)
 | Arduino/ESP32 code generation | — | ✅ |
 | Scan history | Last 3 | Full |
 
-Enforcement is server-side: the wiring and code endpoints return **HTTP 402**
-without a valid entitlement. The current build ships with a *demo* entitlement
-(the paywall's Subscribe button unlocks locally, no charge) so the full flow can
-be tested end-to-end. For production, wire the paywall to Google Play Billing /
-RevenueCat and verify receipts in `backend/app/main.py::_require_premium`.
+### Paying with GCash (no admin approval)
+
+The paywall creates a hosted GCash checkout, the gateway confirms the payment to
+`/api/v1/payments/webhook`, and the backend writes the Firestore entitlement the
+app is already listening to — so Pro switches on by itself, usually within a
+couple of seconds. If the callback is ever lost, the app's `/payments/status`
+polling makes the backend re-check the gateway and activate anyway.
+
+| Plan | Price |
+|---|---|
+| Monthly | ₱199 |
+| Yearly | ₱1,499 |
+| Lifetime | ₱2,999 |
+
+Prices, plans and the gateway all come from the server
+(`GET /api/v1/payments/config`), so changing them needs no new APK. Setup —
+gateway keys, Firebase Admin credentials, testing with the built-in mock
+gateway — is in **[docs/GCASH_PAYMENTS.md](docs/GCASH_PAYMENTS.md)**.
+
+Enforcement stays server-side: wiring and code endpoints return **HTTP 402**
+without a live entitlement (`backend/app/main.py::_require_premium` accepts a
+Firebase ID token whose account has one).
 
 ## Component knowledge base
 
-Ships with 14 curated components: 5mm LED, resistor (with live colour-band
-decoding), push button, potentiometer, NE555, DHT11, HC-SR04, HC-SR501 PIR,
-SG90 servo, SSD1306 OLED, MPU-6050, HC-05 Bluetooth, relay module, L293D.
+**179 curated components**, IoT-heavy, organised into browsable categories:
 
-Adding a component = appending one dict in
-`backend/app/components/database.py` (pins + wiring + code). No other changes needed.
+| Category | Count | Examples |
+|---|---|---|
+| Passives | 16 | resistors (live colour-band decoding), capacitors, inductors, crystals, LDR, NTC |
+| Semiconductors | 17 | LEDs, WS2812B, diodes, MOSFETs, transistors, optocouplers, TRIAC |
+| ICs | 16 | NE555, LM358, 74HC595, ULN2003, L293D, MCP23017, ADS1115, TCA9548A |
+| Environment sensors | 19 | DHT11/22, DS18B20, BME280, BH1750, MQ-2, MH-Z19 CO2, PMS5003, soil, pH, TDS |
+| Motion & distance | 22 | HC-SR04, PIR, MPU-6050/9250, VL53L0X, HX711, encoders, hall, ACS712 |
+| Wireless & IoT | 17 | ESP-01, nRF24L01, LoRa SX1278, HC-12, HM-10 BLE, SIM800L, SIM7600 4G, NEO-6M GPS, RC522, PN532, W5500, RS-485, CAN, ESP32-CAM |
+| Displays | 11 | SSD1306, SH1106, 16x2/20x4 LCD, ST7735, ILI9341, MAX7219, TM1637, e-paper |
+| Motors & actuators | 16 | SG90/MG996R servos, 28BYJ-48, NEMA 17 + A4988, L298N, relays, solenoids, pumps, ESC, Peltier |
+| Power | 12 | 7805, AMS1117, LM2596, MT3608, TP4056, 18650, solar, INA219, PZEM-004T |
+| Boards | 12 | Uno, Nano, Mega, ESP32, ESP32-S3, NodeMCU, D1 Mini, Pico W, Raspberry Pi, Blue Pill, ATtiny85, XIAO |
+| Audio | 8 | buzzers, DFPlayer Mini, MAX9814, INMP441 I2S mic, MAX98357A, PAM8403 |
+| Storage & interface | 13 | DS3231 RTC, microSD, EEPROM, keypad, switches, connectors |
+
+Most entries carry pinouts, per-board wiring (Uno and/or ESP32) and a working
+sketch — including IoT recipes such as MQTT publishing, LoRa nodes, deep-sleep
+battery sensors and Wi-Fi relay control.
+
+Adding a component = appending one dict to the right module in
+`backend/app/components/catalog/`, then re-running
+`python scripts/export_assets.py` to refresh the bundled asset.
 
 ## Safety
 

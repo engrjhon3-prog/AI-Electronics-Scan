@@ -8,3 +8,9 @@ opencv-python-headless==4.10.0.84
 # Requires the tesseract binary on the host (apt-get install tesseract-ocr).
 pytesseract==0.3.13
 Pillow==11.1.0
+# GCash checkout: HTTP client for the payment gateway (also used by TestClient).
+httpx==0.28.1
+# Grants Pro automatically by writing the Firestore entitlement the app reads.
+# Optional at runtime — without it (or without credentials) payments fall back
+# to a local JSON ledger.
+firebase-admin==6.6.0

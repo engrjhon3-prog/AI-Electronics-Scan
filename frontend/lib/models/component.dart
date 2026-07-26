@@ -34,6 +34,9 @@ class Component {
   final List<String> supportedBoards;
   final List<String> tags;
 
+  /// Catalog section the part is filed under ("wireless", "sensors-motion" …).
+  final String category;
+
   const Component({
     required this.id,
     required this.type,
@@ -45,6 +48,7 @@ class Component {
     this.pins = const [],
     this.supportedBoards = const [],
     this.tags = const [],
+    this.category = '',
   });
 
   factory Component.fromJson(Map<String, dynamic> json) => Component(
@@ -64,5 +68,6 @@ class Component {
             (json['supported_boards'] as List?)?.map((e) => e.toString()).toList() ??
                 [],
         tags: (json['tags'] as List?)?.map((e) => e.toString()).toList() ?? [],
+        category: json['category'] as String? ?? '',
       );
 }

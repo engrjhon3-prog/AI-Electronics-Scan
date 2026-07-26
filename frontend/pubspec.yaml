@@ -52,6 +52,9 @@ dependencies:
   # Networking to the optional Python backend (not required for core features).
   http: ^1.2.2
 
+  # Opens the hosted GCash checkout page in the browser / GCash app.
+  url_launcher: ^6.3.1
+
   # Render backend-generated wiring diagrams (SVG).
   flutter_svg: ^2.0.10+1
 

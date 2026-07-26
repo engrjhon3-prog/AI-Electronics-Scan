@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/foundation.dart';
 
 import '../models/component.dart';
+import '../models/entitlement.dart';
 import '../models/history_entry.dart';
 import '../models/scan_result.dart';
 import '../models/wiring.dart';
@@ -14,6 +15,7 @@ import '../services/cloud_uploads_service.dart';
 import '../services/history_service.dart';
 import '../services/local_repository.dart';
 import '../services/on_device_scanner.dart';
+import '../services/payment_service.dart';
 import '../services/subscription_service.dart';
 
 /// Central application state, exposed via Provider.
@@ -28,10 +30,12 @@ class AppState extends ChangeNotifier {
     HistoryService? history,
     SubscriptionService? subscription,
     AuthService? auth,
+    PaymentService? payments,
   })  : repo = repository ?? LocalRepository(),
         _history = history ?? HistoryService(),
         subscription = subscription ?? SubscriptionService(),
-        auth = auth ?? AuthService() {
+        auth = auth ?? AuthService(),
+        payments = payments ?? PaymentService() {
     _scanner = scanner ?? OnDeviceScanner(repo);
   }
 
@@ -40,6 +44,7 @@ class AppState extends ChangeNotifier {
   final HistoryService _history;
   final SubscriptionService subscription;
   final AuthService auth;
+  final PaymentService payments;
   final CloudUploadsService uploads = CloudUploadsService();
 
   /// Outcome of the most recent cloud save ("saved, expires in 12h" /
@@ -56,7 +61,7 @@ class AppState extends ChangeNotifier {
   List<HistoryEntry> get history => List.unmodifiable(_historyEntries);
 
   StreamSubscription<User?>? _authSub;
-  StreamSubscription<bool>? _entitlementSub;
+  StreamSubscription<Entitlement>? _entitlementSub;
   bool _isAdmin = false;
   bool get isAdmin => _isAdmin;
   User? get user => auth.currentUser;
@@ -91,29 +96,52 @@ class AppState extends ChangeNotifier {
     uploads.purgeExpired(user.uid).catchError((_) {});
     final email = user.email;
     if (email != null) {
-      _entitlementSub = auth.entitlementStream(email).listen((docPremium) async {
+      // A confirmed GCash payment writes this document server-side, so Pro
+      // switches on here within a second — no admin approval involved.
+      _entitlementSub = auth.entitlementStream(email).listen((entitlement) async {
         final claims = await auth.readClaims();
-        await subscription.setPremium(claims.premium || docPremium);
+        await subscription.setEntitlement(
+            claims.premium ? _compedEntitlement : entitlement);
         notifyListeners();
       }, onError: (_) {});
     }
   }
 
-  /// Force-refresh claims + entitlement (e.g. right after an admin grants Pro).
+  /// Pro granted by a custom claim (staff / comped accounts): never expires.
+  static const Entitlement _compedEntitlement =
+      Entitlement(premium: true, planName: 'Pro');
+
+  /// Force-refresh claims + entitlement (e.g. right after paying with GCash).
   Future<void> refreshEntitlement() async {
     try {
       final claims = await auth.readClaims(refresh: true);
       _isAdmin = claims.admin;
-      var premium = claims.premium;
+      var entitlement = claims.premium ? _compedEntitlement : Entitlement.none;
       final email = user?.email;
-      if (!premium && email != null) {
-        premium = await auth.fetchEntitlement(email);
+      if (!entitlement.premium && email != null) {
+        entitlement = await auth.fetchEntitlement(email);
       }
-      await subscription.setPremium(premium);
+      await subscription.setEntitlement(entitlement);
     } catch (_) {
       // Offline: keep the cached entitlement.
     }
     notifyListeners();
+  }
+
+  /// Unlock Pro straight from a confirmed payment.
+  ///
+  /// The entitlement stream normally does this on its own; this covers builds
+  /// without Firebase and the moment right after checkout, so the customer is
+  /// never left waiting on a sync.
+  Future<void> applyPaidPayment({String? premiumUntil, String planName = 'Pro'}) async {
+    await subscription.setEntitlement(Entitlement(
+      premium: true,
+      planName: planName,
+      source: 'gcash',
+      expiresAt: premiumUntil == null ? null : DateTime.tryParse(premiumUntil),
+    ));
+    notifyListeners();
+    await refreshEntitlement();
   }
 
   Future<void> signOut() async {
@@ -123,6 +151,10 @@ class AppState extends ChangeNotifier {
   bool get isPremium => subscription.isPremium;
   bool get canScan => subscription.canScan;
   int get freeScansRemaining => subscription.freeScansRemaining;
+
+  /// When the current subscription lapses (`null` = lifetime / not subscribed).
+  DateTime? get premiumUntil => subscription.premiumUntil;
+  String get planName => subscription.planName;
 
   // ---------------------------------------------------------------- catalog
   List<Component> get components => repo.components;
