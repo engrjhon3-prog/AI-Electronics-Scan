@@ -1,0 +1,10 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+pydantic==2.10.4
+numpy==2.2.1
+opencv-python-headless==4.10.0.84
+# OCR is optional but strongly recommended for reading chip labels.
+# Requires the tesseract binary on the host (apt-get install tesseract-ocr).
+pytesseract==0.3.13
+Pillow==11.1.0

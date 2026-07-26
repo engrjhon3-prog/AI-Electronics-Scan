@@ -1,0 +1,108 @@
+name: Build & Test
+
+on:
+  push:
+    branches:
+      - main
+      - "claude/**"
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "Backend URL baked into the APK (e.g. http://YOUR-VAST-IP:PORT)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  backend-tests:
+    name: Backend tests (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt pytest httpx
+      - name: Run tests
+        working-directory: backend
+        run: pytest -q
+
+  build-apk:
+    name: Build Android APK (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: frontend
+        run: flutter analyze
+
+      - name: Flutter tests
+        working-directory: frontend
+        run: flutter test
+
+      - name: Resolve backend URL
+        id: cfg
+        run: |
+          URL="${{ github.event.inputs.api_base_url }}"
+          if [ -z "$URL" ]; then URL="${{ vars.API_BASE_URL }}"; fi
+          if [ -z "$URL" ]; then URL="http://10.0.2.2:8000"; fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Building APK against backend: $URL"
+
+      - name: Build release APK
+        working-directory: frontend
+        run: |
+          flutter build apk --release \
+            --dart-define=API_BASE_URL="${{ steps.cfg.outputs.url }}"
+
+      - name: Rename APK
+        run: |
+          cp frontend/build/app/outputs/flutter-apk/app-release.apk \
+             ai-electronics-scanner.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-electronics-scanner-apk
+          path: ai-electronics-scanner.apk
+          retention-days: 30
+
+      # Rolling pre-release so the APK is downloadable from a stable URL
+      # (handy on a phone browser, no need to dig through Actions artifacts).
+      - name: Publish rolling release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: "Latest APK build"
+          prerelease: true
+          files: ai-electronics-scanner.apk
+          body: |
+            Automatic APK build from `${{ github.ref_name }}` @ `${{ github.sha }}`.
+
+            Backend URL baked in: `${{ steps.cfg.outputs.url }}`
+
+            **Install:** download `ai-electronics-scanner.apk` on your Android
+            phone, open it, and allow installation from unknown sources.
