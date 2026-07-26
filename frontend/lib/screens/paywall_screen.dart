@@ -233,7 +233,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     child: Center(child: CircularProgressIndicator()),
                   )
                 else if (gcashReady)
-                  _buildGCashSection(app, config!)
+                  _buildGCashSection(app, config)
                 else
                   _buildManualSection(app),
               ] else if (app.premiumUntil != null && gcashReady) ...[
@@ -251,7 +251,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildGCashSection(app, config!),
+                _buildGCashSection(app, config),
               ],
             ],
           ),
@@ -355,11 +355,10 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         onPressed: () async {
                           await Clipboard.setData(
                               ClipboardData(text: _checkout!.checkoutUrl));
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Checkout link copied')));
-                          }
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Checkout link copied')));
                         },
                         icon: const Icon(Icons.copy, size: 18),
                         label: const Text('Copy link'),
@@ -458,10 +457,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                   onPressed: () async {
                     await Clipboard.setData(const ClipboardData(
                         text: PaywallScreen.contactEmail));
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Email address copied')));
-                    }
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Email address copied')));
                   },
                   icon: const Icon(Icons.copy, size: 18),
                   label: const Text(PaywallScreen.contactEmail),

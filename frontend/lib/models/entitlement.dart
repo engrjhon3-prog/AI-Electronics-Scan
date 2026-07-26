@@ -30,9 +30,7 @@ class Entitlement {
 
   bool get isLifetime => premium && expiresAt == null;
 
-  int? get daysRemaining => expiresAt == null
-      ? null
-      : expiresAt!.difference(DateTime.now()).inDays;
+  int? get daysRemaining => expiresAt?.difference(DateTime.now()).inDays;
 
   factory Entitlement.fromMap(Map<String, dynamic>? data) {
     if (data == null) return Entitlement.none;
